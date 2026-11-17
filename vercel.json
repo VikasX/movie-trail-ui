@@ -5,15 +5,15 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://movie-trail-py.vercel.app/api/:path*"
+      "source": "/api/:path(.*)",
+      "destination": "https://movie-trail-py.vercel.app/api/:path"
     },
     {
-      "source": "/accounts/:path*",
-      "destination": "https://movie-trail-py.vercel.app/accounts/:path*"
+      "source": "/accounts/:path(.*)",
+      "destination": "https://movie-trail-py.vercel.app/accounts/:path"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api(?:/|$)|accounts(?:/|$)).*)",
       "destination": "/index.html"
     }
   ]

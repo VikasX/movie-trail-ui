@@ -96,3 +96,23 @@ Use the repository root, Vite preset, `npm ci`, `npm run build`, and output dire
 `vercel.json` routes `/api/*` and `/accounts/*` to `https://movie-trail-py.vercel.app` before the SPA fallback. Django must trust the frontend origin, preserve host-only session/CSRF cookies through the proxy, and configure its public callback and frontend origin according to the contract. Confirm Set-Cookie forwarding, redirects, and CSRF on the deployed topology before using real authentication.
 
 The frontend deployment is https://movie-trail-ui.vercel.app. This implementation does not publish or push automatically.
+
+### API proxy routing and verification
+
+The API and OAuth rewrites use named `(.*)` captures so trailing slashes reach Django. Vercel compiles rewrite sources with strict path matching. The previous `/api/:path*` and `/accounts/:path*` patterns matched slashless requests but missed Django's slash-ending URLs. Django's append-slash redirect then landed on the unrestricted SPA fallback and returned HTML. The fallback now explicitly excludes the `api` and `accounts` namespaces. Missing backend routes retain the backend response.
+
+Regression tests use Vercel's actual `@vercel/routing-utils` compiler to reproduce the old failure and check API paths, OAuth callbacks, query strings, and frontend deep links. The compiler implementation is available in [Vercel's routing source](https://github.com/vercel/vercel/blob/main/packages/routing-utils/src/superstatic.ts).
+
+The existing deployed JavaScript was checked during diagnosis and already contained live mode, `/api/v1/`, and `https://movie-trail-ui.vercel.app`. GitHub's Vercel status reported the current `7a00f00` source commit, and that commit included the rewrite configuration. `vercel.json` is tracked and is not ignored. There are no repository middleware, build-output route overrides, legacy `routes` entries, or `.vercelignore` files. Authenticated Vercel Root Directory and project-level routing settings were unavailable for direct inspection. The slashless requests reaching Django independently demonstrate that the production proxy rules are active.
+
+For Vercel Git deployments, keep Root Directory at the repository root, the Vite framework preset, `npm run build`, and `dist` output. Keep production `VITE_API_MODE=live`, `VITE_API_BASE_URL=/api/v1/`, and `VITE_APP_URL=https://movie-trail-ui.vercel.app`. Deploy from the repository root so Vercel reads `vercel.json`. Uploading only `dist` omits this configuration. A separately configured CDN catch-all, if present, must exclude API/OAuth namespaces because project-level rules precede deployment routes.
+
+After an authorized deployment, run the read-only verification command. It exits unsuccessfully for HTML responses, HTTP errors, or invalid endpoint shapes.
+
+```sh
+npm run verify:deployment
+# Or verify a specific authorized deployment URL
+npm run verify:deployment -- https://your-deployment.vercel.app
+```
+
+It checks frontend-domain health, metadata, and titles JSON. Then open `/discover`, confirm real title cards and genres render, and inspect the browser Network panel for same-origin JSON responses. A local build or passing route test alone does not verify the released deployment.
