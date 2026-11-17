@@ -1,65 +1,98 @@
 ﻿# CineScope
 
-A minimal React and TypeScript frontend for discovering movies and TV series.
+A responsive movie and TV discovery frontend built with React, strict TypeScript, Vite, Tailwind CSS, shadcn/Radix primitives, Redux Toolkit, RTK Query, React Router, React Hook Form, Zod, and Sonner.
 
-## Local setup
+## Run locally
 
-Use Node.js 22.12+ (or 20.19+) and npm.
+Use Node.js 20.19+ or 22.12+ and npm.
 
-```sh
+```powershell
 npm ci
-cp .env.example .env.local
+Copy-Item .env.example .env.local
 npm run dev
 ```
 
-In PowerShell, use `Copy-Item .env.example .env.local` for the copy step. Open the URL printed by Vite, normally http://localhost:5173.
+Open the URL Vite prints, normally http://localhost:5173. The default is mock mode and runs without Django. Continue as Guest to browse. For a demo account use any valid email and any nonempty password. The demo has one account persona, stores no password, sends no emails, and performs no real Google authentication.
 
-`VITE_API_BASE_URL` configures the base URL for future backend requests and defaults to `/api`. The starter runs without a backend. Vite embeds `VITE_*` values in the browser bundle, so use public configuration values. Restart the dev server after editing environment variables.
+## Environment switching
 
-## Commands
+`.env.example` includes commented local and deployed URL options. Copy it to `.env.local`, select the values, then restart Vite. Vite embeds public `VITE_*` values at build time, so redeploy when those values change.
 
-- `npm run dev` starts the development server.
-- `npm run lint` checks ESLint rules with zero warnings allowed.
-- `npm run typecheck` checks the app and Vite configuration with TypeScript.
-- `npm run format` formats source and configuration files with Prettier.
-- `npm run format:check` checks formatting.
-- `npm run build` type-checks and produces the production bundle in `dist`.
-- `npm run preview` serves the production build locally.
+- `VITE_API_MODE=mock` starts MSW before React mounts. `live` uses Django directly through the configured API prefix.
+- `VITE_API_BASE_URL=/api/v1/` is the recommended browser API prefix for both local and deployed environments.
+- `API_PROXY_TARGET=http://localhost:8000` directs Vite's `/api` and `/accounts` development proxy to local Django. A commented option points to `https://movie-trail-py.vercel.app`.
+- `VITE_APP_URL` may be blank to use the current origin, or set to `http://localhost:5173` or `https://movie-trail-ui.vercel.app` for demo share URLs.
+- Direct backend API URL options are provided for catalogue testing. Session authentication between unrelated Vercel domains uses the same-origin proxy described in the contract.
 
-## Project structure
+Backend documentation is at https://movie-trail-py.vercel.app/api/docs. The product API prefix is `/api/v1/`.
 
-```text
-src/
-  components/ui/     shadcn/ui components
-  hooks/             Typed Redux hooks and future shared hooks
-  lib/               Shared utilities, including cn()
-  pages/             Homepage and 404 page
-  services/          RTK Query base API
-  store/             Typed Redux store and example UI slice
-  types/             Shared declarations and environment types
-  App.tsx            Route definitions
-  main.tsx           React entry point and providers
-  index.css          Tailwind imports and shadcn theme tokens
+## Implemented routes
+
+- `/` provides Guest, Google, and Email entry.
+- `/discover` provides title and people search, AND genre filters, year/runtime ranges, rating, language, sort, recommendation tools, recent activity, feeds, and snapshot pagination.
+- `/library` provides saved titles, watchlist, watched titles, custom collections, and automatic groups. `?tab=custom` opens collections.
+- `/library/collections/:id` opens a custom or automatic collection.
+- `/shared/:token` provides a public read-only collection. `/shared/demo` is a sample mock collection.
+- `/auth/verify` and `/auth/reset-password` consume email-link tokens through the API. Tokens are removed from the address bar on page entry and held in memory until submission.
+- Unknown routes show the 404 screen.
+
+Trailer details open in a focus-trapped Radix overlay. Escape closes it. The underlying page remains mounted, retaining filters, pagination, and scroll. A single YouTube iframe is mounted at a time. Queue navigation loads later discovery pages when necessary. Titles without fixture trailers display the unavailable state.
+
+Create/edit/delete, multi-collection save, sharing, authentication, mood, and guest synchronization use reusable dialogs. Collection deletion has a confirmation step. Automatic collections are read-only.
+
+## State and API architecture
+
+`src/store` contains typed UI and guest slices. `src/hooks` contains typed Redux hooks and the common library adapter. Guest writes use the latest store snapshot so consecutive collection mutations preserve previous changes.
+
+`src/services/base-api.ts` centralizes credentials, masked CSRF bootstrapping, and headers. CSRF remains in memory. Django session cookies remain browser-managed. Public shared reads omit credentials. `src/services/api.ts` defines metadata, discovery, people, details, recommendations, auth/profile, recent, library, collection membership, sharing, public collections, and sync endpoints with cache invalidation.
+
+OpenAPI types are generated from `docs/openapi.yaml` into `src/types/api.generated.ts`. Regenerate with `npm run types:generate`. `docs/API_CONTRACT.md` supplies the additional cross-field rules.
+
+RTK Query owns server state. React Router search parameters own shareable discovery filters. Redux owns dialogs, trailer queues, the user session view, and guest data. Feature folders contain the screen components and interactions.
+
+## Guest persistence and synchronization
+
+The versioned `cinescope:guest:v1` localStorage entry stores normalized title summaries, watched state and timestamps, collections, and recent activity. Movie and TV identity always uses both `media_type` and `tmdb_id`. Invalid storage recovers to an empty library. Guest limits are 500 saved titles and 20 collections, matching one sync payload's capacity.
+
+Saving watched status retains the title. Explicit unsave removes custom memberships. Guest automatic groups cover genres, decades, rating >= 8, movies, TV, and watched status.
+
+Sign-in offers an explicit import when guest data exists. Not Now preserves it. Pending sync snapshots and immutable payloads are retained in sessionStorage so retries reuse the same sync ID and body. Success clears only accepted, unchanged records and retains concurrent edits and rejected titles. Recent activity remains local and is excluded from sync. Guest and account data use separate namespaces.
+
+## Mock coverage and content
+
+`src/mocks` contains separate fixtures, filtering logic, MSW handlers, and the browser worker. The handlers intercept the same `/api/v1/` paths used by live mode. They simulate catalogue filters/sorting, immutable snapshots, pagination, details, authentication, account library, recent activity, collections, membership, sharing/revocation, recommendation moods, and sync receipts.
+
+Demo mutations persist in this browser. Demo share links have browser-local scope. Real cross-device sharing and secure authentication require Django. Search for `error` to exercise the demo upstream-error state. A nonmatching title exercises empty results. An unknown shared token returns 404. A stale snapshot returns 410.
+
+Movie metadata and ratings are representative fixture values. New Releases follows the last 90 days and may be empty because fixtures are historical. No provider availability is fabricated. Trailer fixtures use known public trailers for Dune: Part Two, Interstellar, and Oppenheimer. Other titles exercise the no-trailer state. Poster artwork reuses approved Stitch assets, with text artwork fallbacks for missing images.
+
+The frontend has no direct TMDB JSON requests. Images may use returned CDN URLs. Video embeds use YouTube. TMDB and JustWatch attribution appears in the UI.
+
+## Design and contract decisions
+
+The implementation follows the seven finalized screens in https://stitch.google.com/projects/2796373769027149979, using the exported charcoal/blue palette, Outfit headings, and Inter body type. Desktop layouts adapt into mobile grids, horizontal rails, compact navigation, stacked filters, and full-screen trailer dialogs.
+
+The exported screens still contained some removed functionality and fictional hardware/provider copy. The explicit product brief governs implemented features and content. The welcome illustration uses a restrained CSS fallback. Placeholder assets in the sync design are replaced by the guest's actual saved poster previews.
+
+The contract's Collection and PublicCollection schemas contain no description field. Guest descriptions are local-only and excluded from API/sync payloads. Account collection editing and public sharing use the supported name field. Trailer IDs follow the trailer schema despite its copied collection-ID description. No incompatible API fields were added.
+
+## Verification
+
+```sh
+npm run test
+npm run lint
+npm run typecheck
+npm run format:check
+npm run build
+npm run preview
 ```
 
-The `@/` alias points to `src/` in both TypeScript and Vite. The homepage reads the example `showReadyStatus` UI state. Use `useAppDispatch` and `useAppSelector` from `@/hooks/redux` for typed Redux access.
+Vitest and Testing Library run critical storage and DOM/network journeys against MSW. They cover guest save/persistence, multi-collection saving, watched preservation, filters, recommendations, trailer queue cleanup, mock sign-in, explicit sync, idempotency, share revocation, and snapshots. Browser visual and viewport QA needs a browser session that permits automation. Live Google OAuth, email delivery, cookie/proxy behavior, and actual backend data need end-to-end testing against deployed Django.
 
-RTK Query's reducer and middleware are registered in the store. Future service modules can extend `baseApi` with `injectEndpoints`. The API currently has an empty endpoint definition.
+## Vercel
 
-Tailwind CSS uses the official Vite plugin. shadcn/ui is configured in `components.json`, with theme variables in `src/index.css`. Add components as needed with `npx shadcn@latest add <component>`. Future Stitch designs can use the existing pages, shared components, and theme tokens.
+Use the repository root, Vite preset, `npm ci`, `npm run build`, and output directory `dist`. Set `VITE_API_MODE=mock` for the demo or `live` for Django integration.
 
-## Vercel deployment
+`vercel.json` routes `/api/*` and `/accounts/*` to `https://movie-trail-py.vercel.app` before the SPA fallback. Django must trust the frontend origin, preserve host-only session/CSRF cookies through the proxy, and configure its public callback and frontend origin according to the contract. Confirm Set-Cookie forwarding, redirects, and CSRF on the deployed topology before using real authentication.
 
-1. Push the repository to your Git host and import it into Vercel.
-2. Use the repository root as the Root Directory and select the Vite framework preset.
-3. Use `npm ci` as the install command, `npm run build` as the build command, and `dist` as the output directory.
-4. Set `VITE_API_BASE_URL` in Vercel when a backend is available. Set it for each required environment, then redeploy to embed the value in the bundle.
-5. Deploy. Check `/` and a direct visit to an unknown path to verify the homepage and client-side 404 route.
-
-`vercel.json` supplies the Vite build settings and rewrites SPA paths to `index.html`, so direct visits and refreshes reach React Router. Static assets are served normally. For other static hosts, publish `dist` and configure the equivalent SPA fallback.
-
-## Configuration references
-
-- [Tailwind with Vite](https://tailwindcss.com/docs/installation/using-vite)
-- [shadcn/ui with Vite](https://ui.shadcn.com/docs/installation/vite)
-- [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite)
+The frontend deployment is https://movie-trail-ui.vercel.app. This implementation does not publish or push automatically.

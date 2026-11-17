@@ -6,7 +6,14 @@ import tseslint from 'typescript-eslint'
 import prettier from 'eslint-config-prettier'
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules'] },
+  {
+    ignores: [
+      'dist',
+      'node_modules',
+      'public/mockServiceWorker.js',
+      'src/types/api.generated.ts',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -15,6 +22,10 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true },
+      ],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
