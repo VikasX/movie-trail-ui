@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form'
 // The adapter connecting Zod rules to React Hook Form.
 import { zodResolver } from '@hookform/resolvers/zod'
 // Runtime schemas that validate values rather than relying only on TypeScript.
-import { z } from 'zod'
+import { z } from '@/lib/validation'
 // SVG icon components used by the controls and headings below.
 import { Copy, Plus, CloudUpload } from 'lucide-react'
 // Toast notifications shown after an operation succeeds or fails.
@@ -45,6 +45,7 @@ import {
   readLibrary,
   reconcileSync,
   syncPayload,
+  readSyncJob,
 } from '@/features/guest/storage'
 // Bring in the exported helpers/components from `@/types/models`.
 import {
@@ -56,6 +57,7 @@ import {
 } from '@/types/models'
 // Bring in the exported helpers/components from `@/lib/config`.
 import { config } from '@/lib/config'
+import { store } from '@/store'
 
 /** Read the Redux dialog fields and mount the corresponding collection or sync form. */
 export function CollectionDialogs() {
@@ -833,6 +835,8 @@ function GuestSyncDialog(
   // Use the original frozen job when retrying. Creating a new payload for an uncertain prior response could double-count a sync.
   // Keep `run` as a callback that runs when it is called and returns a promise.
   const run = async () => {
+    // A session may expire while this dialog is open. Never turn an anonymous click into an import.
+    if (!user || store.getState().ui.user?.id !== user.id) return
     // Attempt these operations; a thrown error transfers control to catch when supplied, and finally runs afterward when supplied.
     try {
       // Keep `job` as an initially empty value.
@@ -847,7 +851,7 @@ function GuestSyncDialog(
       // Keep `pending` as the result returned by `sessionStorage.getItem` with these arguments.
       const pending = sessionStorage.getItem(JOB_KEY)
       // Keep `old` as a choice between two values based on `pending`.
-      const old = pending ? (JSON.parse(pending) as typeof job) : null
+      const old = readSyncJob(pending, user.id)
       // Take this branch only when `old && old.owner === user?.id` is truthy.
       if (old && old.owner === user?.id) job = old
       else {
@@ -860,6 +864,8 @@ function GuestSyncDialog(
       }
       // Keep `result` as the completed result of `sync(job.payload).unwrap()`; await pauses this async function until the promise settles.
       const result = await sync(job.payload).unwrap()
+      // An account change during the request must not clear the guest's local copy.
+      if (store.getState().ui.user?.id !== job.owner) return
       // Read guest storage again after the request, retaining records the user may have changed while the import was running.
       // Keep `current` as the result returned by `readLibrary` with these arguments.
       const current = readLibrary()

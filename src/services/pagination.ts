@@ -13,6 +13,10 @@ import type {
 } from '@reduxjs/toolkit/query'
 // Bring in compile-time types from `@/types/models`.
 import type { Schema } from '@/types/models'
+import { safePageUrl } from '@/lib/security'
+
+// Django's API contract allows at most 50 items per page, including public shares.
+export const PAGE_SIZE = 50
 // T stands for the type of one row. The same page shape can contain saved titles or collection summaries.
 // Define `Page` as a compile-time type alias for the shape below; it creates no runtime object.
 type Page<T> = {
@@ -37,13 +41,22 @@ export async function fetchComplete<T>(
   /* The API-relative path requested through the configured base query. */ path: string,
   /* The endpoint-provided request function, retaining shared cookie/CSRF handling. */ fetchPage: FetchPage,
 ) {
-  // Keep `next` as the expression `path + '?page_size=100'`.
-  let next = path + '?page_size=100'
+  // Start within the API limit; subsequent requests keep the server's snapshot parameters.
+  let next = path + '?page_size=' + PAGE_SIZE
   // Keep `combined` as an initially empty value.
   let combined: Page<T> | undefined
+  const seen = new Set<string>()
   // Request another page only while the previous response provides one.
   // Repeat the following work while `next` remains truthy.
   while (next) {
+    if (seen.has(next) || seen.size >= 1000)
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Invalid pagination response.',
+        },
+      }
+    seen.add(next)
     // Stop on a request error so callers can show a retry instead of treating a partial list as complete.
     // Keep `result` as the completed result of `fetchPage(next)`; await pauses this async function until the promise settles.
     const result = await fetchPage(next)
@@ -51,6 +64,13 @@ export async function fetchComplete<T>(
     if (result.error) return { error: result.error }
     // Keep `page` as the value read from `result.data` with a TypeScript shape assertion; the assertion adds no runtime validation.
     const page = result.data as Page<T>
+    if (!page || !Array.isArray(page.results))
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Invalid page response.',
+        },
+      }
     // Update `combined` using a choice between two values based on `combined`.
     combined = combined
       ? { ...page, results: [...combined.results, ...page.results] }
@@ -59,7 +79,14 @@ export async function fetchComplete<T>(
     if (!page.next) break
     // Keep the server-issued page/snapshot parameters while retaining the configured API path and origin.
     // Keep `url` as a new URL instance initialized with these arguments.
-    const url = new URL(page.next)
+    const url = safePageUrl(page.next)
+    if (!url)
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Invalid pagination response.',
+        },
+      }
     // Update `next` using the expression `path + '?' + url.searchParams.toString()`.
     next = path + '?' + url.searchParams.toString()
   }
@@ -72,18 +99,34 @@ export async function fetchCollection(
   /* The API-relative path requested through the configured base query. */ path: string,
   /* The endpoint-provided request function, retaining shared cookie/CSRF handling. */ fetchPage: FetchPage,
 ) {
-  // Keep `next` as the expression `path + '?page_size=100'`.
-  let next = path + '?page_size=100'
+  // Collection item pages use the same maximum as the library and collection lists.
+  let next = path + '?page_size=' + PAGE_SIZE
   // Keep `combined` as an initially empty value.
   let combined: Schema['CollectionDetail'] | undefined
+  const seen = new Set<string>()
   // Repeat the following work while `next` remains truthy.
   while (next) {
+    if (seen.has(next) || seen.size >= 1000)
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Invalid pagination response.',
+        },
+      }
+    seen.add(next)
     // Keep `result` as the completed result of `fetchPage(next)`; await pauses this async function until the promise settles.
     const result = await fetchPage(next)
     // Take this branch only when `result.error` is truthy.
     if (result.error) return { error: result.error }
     // Keep `data` as the value read from `result.data` with a TypeScript shape assertion; the assertion adds no runtime validation.
     const data = result.data as Schema['CollectionDetail']
+    if (!data?.items || !Array.isArray(data.items.results))
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Invalid page response.',
+        },
+      }
     // Update `combined` using a choice between two values based on `combined`.
     combined = combined
       ? {
@@ -100,7 +143,15 @@ export async function fetchCollection(
     // Take this branch only when `!data.items.next` is truthy.
     if (!data.items.next) break
     // Update `next` using the expression `path + '?' + new URL(data.items.next).searchParams.toString()`.
-    next = path + '?' + new URL(data.items.next).searchParams.toString()
+    const url = safePageUrl(data.items.next)
+    if (!url)
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Invalid pagination response.',
+        },
+      }
+    next = path + '?' + url.searchParams.toString()
   }
   // Return an object whose named fields are explained below to the caller.
   return {

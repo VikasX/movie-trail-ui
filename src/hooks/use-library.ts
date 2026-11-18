@@ -199,13 +199,48 @@ export function errorMessage(
   /* Input e used by this helper; its type describes the accepted values. */ e: unknown,
 ): string {
   // Take this branch only when `e instanceof Error` is truthy.
-  if (e instanceof Error) return e.message
+  // Only known local errors may be shown verbatim. Browser/storage/library exceptions can contain details.
+  if (
+    e instanceof Error &&
+    /^(?:Your guest library|A collection already|Automatic collections|This collection link|This link is missing|Sign in could not be started)/.test(
+      e.message,
+    )
+  )
+    return e.message.slice(0, 200)
   // Take this branch only when `e && typeof e === 'object' && 'data' in e` is truthy.
   if (e && typeof e === 'object' && 'data' in e) {
     // Keep `data` as the value read from `e.data` with a TypeScript shape assertion; the assertion adds no runtime validation.
-    const data = e.data as { error?: { message?: string } }
+    const data = e.data as { error?: { code?: string } } | undefined
     // Take this branch only when `data?.error?.message` is truthy.
-    if (data?.error?.message) return data.error.message
+    const messages: Record<string, string> = {
+      authentication_required: 'Please sign in to continue.',
+      invalid_credentials:
+        'Sign in could not be completed. Check your details and try again.',
+      email_not_verified: 'Please verify your email before signing in.',
+      validation_error: 'Please check the entered values and try again.',
+      not_found: 'This item is unavailable or no longer shared.',
+      snapshot_expired: 'This selection expired. Reload it to continue.',
+      csrf_failed:
+        'Your session needs refreshing. Reload the page and try again.',
+      permission_denied:
+        'This action could not be completed. Refresh your session and try again.',
+      conflict:
+        'This change conflicts with an existing record. Refresh and try again.',
+      rate_limited: 'Too many requests. Please wait and try again.',
+      service_unavailable:
+        'This service is temporarily unavailable. Please try again later.',
+      upstream_timeout: 'The request timed out. Please try again.',
+      payload_too_large: 'This selection is too large to import.',
+    }
+    if (data?.error?.code && Object.hasOwn(messages, data.error.code))
+      return messages[data.error.code]
+  }
+  if (e && typeof e === 'object' && 'status' in e) {
+    if (e.status === 401) return 'Please sign in to continue.'
+    if (e.status === 404) return 'This item is unavailable or no longer shared.'
+    if (e.status === 403)
+      return 'This action could not be completed. Refresh your session and try again.'
+    if (e.status === 429) return 'Too many requests. Please wait and try again.'
   }
   // Return the text `'Something went wrong. Please try again.'` to the caller.
   return 'Something went wrong. Please try again.'

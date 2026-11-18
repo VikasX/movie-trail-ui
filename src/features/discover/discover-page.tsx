@@ -42,6 +42,7 @@ import type { Title, Schema } from '@/types/models'
 import { titleKey } from '@/types/models'
 // Bring in the exported helpers/components from `@/lib/filters`.
 import { parseFilters, recommendationFilters } from '@/lib/filters'
+import { pageFromUrl } from '@/lib/security'
 
 /** Fetch and render one horizontal feed, such as Trending Now or New Releases. */
 function Rail(
@@ -984,14 +985,21 @@ export function DiscoverPage() {
               className="button secondary"
               onClick={
                 /* React calls this callback when the control is clicked. The arrow body below performs the action. */ () => {
-                  // Keep `next` as a new URL instance initialized with these arguments.
-                  const next = new URL(result.data!.next!)
+                  // Parse validated paging values without navigating to the supplied API URL.
+                  const next = pageFromUrl(result.data!.next!)
+                  if (!next) {
+                    toast.error(
+                      'This selection could not be loaded. Please retry.',
+                    )
+                    return
+                  }
                   // Keep `p` as an editable set of URL query parameters copied from the supplied input.
                   const p = new URLSearchParams(params)
                   // Assign the supplied value under key `'page'` in `p`.
-                  p.set('page', next.searchParams.get('page')!)
+                  p.set('page', String(next.page))
                   // Assign the supplied value under key `'snapshot'` in `p`.
-                  p.set('snapshot', next.searchParams.get('snapshot')!)
+                  if (next.snapshot) p.set('snapshot', next.snapshot)
+                  else p.delete('snapshot')
                   // Call `setParams` with `p` to update its state or routed value.
                   setParams(p, { replace: true })
                 }

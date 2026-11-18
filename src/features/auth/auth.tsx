@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form'
 // The adapter connecting Zod rules to React Hook Form.
 import { zodResolver } from '@hookform/resolvers/zod'
 // Runtime schemas that validate values rather than relying only on TypeScript.
-import { z } from 'zod'
+import { z } from '@/lib/validation'
 // SVG icon components used by the controls and headings below.
 import { Film, Mail, ArrowRight } from 'lucide-react'
 // Toast notifications shown after an operation succeeds or fails.
@@ -23,6 +23,7 @@ import { toast } from 'sonner'
 import { api } from '@/services/api'
 // Bring in the exported helpers/components from `@/lib/config`.
 import { config } from '@/lib/config'
+import { safeOAuthUrl } from '@/lib/security'
 // Bring in the exported helpers/components from `@/hooks/redux`.
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 // Bring in the exported helpers/components from `@/store/ui-slice`.
@@ -57,7 +58,14 @@ export function GoogleButton() {
         return_to: '/discover',
       }).unwrap()
       // Call `window.location.assign` with the arguments below to perform this step.
-      window.location.assign(result.authorization_url)
+      // Validate API-provided navigation before handing it to the browser.
+      const destination = safeOAuthUrl(
+        result.authorization_url,
+        window.location.origin,
+      )
+      if (!destination)
+        throw new Error('Sign in could not be started. Please try again.')
+      window.location.assign(destination)
     } catch (e) {
       // Show the user this error toast message.
       toast.error(errorMessage(e))

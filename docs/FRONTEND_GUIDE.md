@@ -414,6 +414,8 @@ An `onClick` callback runs when the click occurs. A `className` selects styling 
 - [src/types/env.d.ts](../src/types/env.d.ts) describes the public Vite environment variable names to TypeScript.
 - [src/types/api.generated.ts](../src/types/api.generated.ts) is generated from OpenAPI. Search for a schema name such as `TitleSummary` when you need its fields. `npm run types:generate` recreates this file.
 - [src/lib/config.ts](../src/lib/config.ts) reads the API mode, base prefix, and public UI origin.
+- [src/lib/security.ts](../src/lib/security.ts) validates browser URL destinations, images, video IDs, route identities, and pagination values. Invalid public API settings fall back to the same-origin `/api/v1/` prefix.
+- [src/lib/validation.ts](../src/lib/validation.ts) configures Zod's interpreted validation before application schemas are created, allowing validation under the production Content Security Policy.
 - [src/lib/filters.ts](../src/lib/filters.ts) converts URL values and selects valid recommendation-filter fields.
 - [src/lib/utils.ts](../src/lib/utils.ts) re-exports `cn`, the installed helper for combining CSS classes and resolving Tailwind conflicts.
 
@@ -522,6 +524,6 @@ The deployment verifier therefore checks content type and basic response shape a
 
 For a request problem, the browser Network panel shows the URL, method, status, content type, and response. A successful HTML response on an API URL points toward routing. A JSON error can be followed into the API error message and corresponding request fields.
 
-For a guest-data problem, inspect the `cinescope:guest:v1` entry in browser localStorage and compare it with `store.guest` in Redux DevTools. For dialog visibility, inspect `store.ui`. For cached server data, inspect `store.api` and the Network panel together.
+For a guest-data problem during local development, inspect the `cinescope:guest:v1` entry in browser localStorage and compare it with `store.guest` in Redux DevTools. For dialog visibility, inspect `store.ui`. For cached server data, inspect `store.api` and the Network panel together. Redux DevTools is disabled in production to keep authentication actions out of its history.
 
 An approachable first reading session is `main.tsx` → `App.tsx` → `movie-card.tsx` → `use-library.ts` → `storage.ts`. After that, follow one account save through `api.ts` and `base-api.ts`. The fixture lists, generated types, and full contract can be consulted as references when you need particular fields.

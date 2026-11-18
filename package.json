@@ -1,6 +1,11 @@
 {
   "name": "cinescope",
   "private": true,
+  "overrides": {
+    "@vercel/routing-utils": {
+      "path-to-regexp": "6.3.0"
+    }
+  },
   "version": "0.0.0",
   "type": "module",
   "scripts": {

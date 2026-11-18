@@ -39,6 +39,7 @@ import { errorMessage } from '@/hooks/use-library'
 import { store } from '@/store'
 // Routing tools for links, page matching, navigation, and URL values.
 import { useLocation } from 'react-router'
+import { isYoutubeId, safePageUrl, safeTmdbUrl } from '@/lib/security'
 /** Read the current Redux trailer selection and mount its content using the selected title as a key. */
 export function TrailerModal() {
   // A null Redux selection means there is no active trailer overlay.
@@ -125,7 +126,7 @@ function TrailerContent(
   // Keep `trailers` as `detail?.trailers.filter( (v) => v.site === 'YouTube' && /^[A-Za-z0-9_-]{11}$/.test(v.youtube_key), )`, falling back to the right-hand value when the left side is falsy.
   const trailers =
     detail?.trailers.filter(
-      (v) => v.site === 'YouTube' && /^[A-Za-z0-9_-]{11}$/.test(v.youtube_key),
+      (v) => v.site === 'YouTube' && isYoutubeId(v.youtube_key),
     ) || []
   // video is the index of a video within this title. index is the separate position of this title in the queue.
   // Keep `selected` as the value read from `trailers[video]`.
@@ -146,11 +147,16 @@ function TrailerContent(
     }
     // Take this branch only when `!next` is truthy.
     if (!next) return
+    const nextUrl = safePageUrl(next)
+    if (!nextUrl) {
+      toast.error('This selection could not be loaded. Please retry.')
+      return
+    }
     // Call `setSkipping` with `true` to update its state or routed value.
     setSkipping(true)
     // Keep `request` as the result returned by `dispatch` with these arguments.
     const request = dispatch(
-      api.endpoints.titles.initiate(parseFilters(new URL(next).searchParams)),
+      api.endpoints.titles.initiate(parseFilters(nextUrl.searchParams)),
     )
     // Attempt these operations; a thrown error transfers control to catch when supplied, and finally runs afterward when supplied.
     try {
@@ -204,11 +210,11 @@ function TrailerContent(
         if (!store.getState().ui.trailer) return
         // Take this branch only when `i >= candidates.length && nextPage` is truthy.
         if (i >= candidates.length && nextPage) {
+          const nextUrl = safePageUrl(nextPage)
+          if (!nextUrl) break
           // Keep `request` as the result returned by `dispatch` with these arguments.
           const request = dispatch(
-            api.endpoints.titles.initiate(
-              parseFilters(new URL(nextPage).searchParams),
-            ),
+            api.endpoints.titles.initiate(parseFilters(nextUrl.searchParams)),
           )
           // Attempt these operations; a thrown error transfers control to catch when supplied, and finally runs afterward when supplied.
           try {
@@ -231,8 +237,12 @@ function TrailerContent(
         try {
           // Keep `d` as the completed result of `request.unwrap()`; await pauses this async function until the promise settles.
           const d = await request.unwrap()
-          // Take this branch only when `d.trailers.length` is truthy.
-          if (d.trailers.length) {
+          // Skip titles whose returned trailer entries have no accepted YouTube video ID.
+          if (
+            d.trailers.some(
+              (v) => v.site === 'YouTube' && isYoutubeId(v.youtube_key),
+            )
+          ) {
             // Take this branch only when `store.getState().ui.trailer` is truthy.
             if (store.getState().ui.trailer)
               // Send `openTrailer({ queue: candidates, index: i, next: nextPage })` to Redux so its matching reducer/middleware can process it.
@@ -439,12 +449,13 @@ function TrailerContent(
                   ),
                 )}
                 {/* Render the right-hand content only when `detail.availability.link` is truthy. */}
-                {detail.availability.link && (
+                {safeTmdbUrl(detail.availability.link) && (
                   <a
                     className="text-button"
                     href={
-                      /* Use this expression as the link destination. */ detail
-                        .availability.link
+                      /* Only the contract's trusted TMDB watch page may become a link. */ safeTmdbUrl(
+                        detail.availability.link,
+                      )
                     }
                     target="_blank"
                     rel="noreferrer"

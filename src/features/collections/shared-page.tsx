@@ -21,6 +21,7 @@ import { MovieGrid } from '@/features/titles/movie-card'
 import { EmptyState, ErrorState, LoadingSkeleton } from '@/components/feedback'
 // Bring in the exported helpers/components from `@/lib/config`.
 import { config } from '@/lib/config'
+import { pageFromUrl } from '@/lib/security'
 /** Fetch the public collection identified by the token in the URL and render its read-only list. */
 export function SharedPage() {
   // The opaque token comes from the React route and is sent to the public collection endpoint.
@@ -114,14 +115,20 @@ export function SharedPage() {
                 className="button secondary"
                 onClick={
                   /* React calls this callback when the control is clicked. The arrow body below performs the action. */ () => {
-                    // Keep `u` as a new URL instance initialized with these arguments.
-                    const u = new URL(data.items.next!)
+                    // Read bounded paging values while retaining the configured API origin.
+                    const u = pageFromUrl(data.items.next!)
+                    if (!u) {
+                      toast.error(
+                        'This selection could not be loaded. Please retry.',
+                      )
+                      return
+                    }
                     // Call `setPaging` with `{ page: Number(u.searchParams.get('page')), snapshot: u.searchParams.get('snapshot') || undefined, }` to update its state or routed value.
                     setPaging({
                       // Set the `page` field to the result returned by `Number` with these arguments.
-                      page: Number(u.searchParams.get('page')),
+                      page: u.page,
                       // The server token retaining the same selection across pages.
-                      snapshot: u.searchParams.get('snapshot') || undefined,
+                      snapshot: u.snapshot,
                     })
                   }
                 }

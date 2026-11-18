@@ -71,9 +71,8 @@ export function SessionBootstrap() {
       // Take this branch only when `auth !== 'success'` is truthy.
       if (auth !== 'success')
         // Show the user this error toast message.
-        toast.error(
-          'Sign in could not be completed: ' + auth.replaceAll('_', ' '),
-        )
+        // A URL parameter must never become an arbitrary provider/internal error notification.
+        toast.error('Sign in could not be completed. Please try again.')
       // Keep `next` as an editable set of URL query parameters copied from the supplied input.
       const next = new URLSearchParams(params)
       // Remove `'auth'` from `next`.

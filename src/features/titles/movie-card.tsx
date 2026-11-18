@@ -17,6 +17,7 @@ import { openTrailer, setSave } from '@/store/ui-slice'
 import { titleKey, type Title } from '@/types/models'
 // React hooks and component/type helpers used to build this file’s interface.
 import { useState } from 'react'
+import { safeImageUrl } from '@/lib/security'
 /** Render the supplied poster, falling back to a title illustration if it is missing or fails. */
 export function Poster(
   /* Destructure the component inputs into the local names listed below. The following type describes each prop. */ {
@@ -26,11 +27,10 @@ export function Poster(
   // Remember a failed image request for this poster component so the title fallback can be rendered.
   // Keep `[failed, setFailed]` as React state initialized from `false`; the first tuple value is current state and the second is its setter.
   const [failed, setFailed] = useState(false)
-  return title.poster_url && !failed ? (
+  const poster = safeImageUrl(title.poster_url)
+  return poster && !failed ? (
     <img
-      src={
-        /* Use this expression as the image/player resource URL. */ title.poster_url
-      }
+      src={/* Only allowlisted HTTPS image URLs reach the browser. */ poster}
       alt={title.title + ' poster'}
       loading="lazy"
       onError={

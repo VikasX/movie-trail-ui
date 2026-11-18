@@ -17,22 +17,53 @@ import {
 import { config } from '@/lib/config'
 // fetchBaseQuery wraps browser fetch. credentials include lets the browser send session cookies.
 // Keep `raw` as the result returned by `fetchBaseQuery` with these arguments.
-const raw = fetchBaseQuery({ baseUrl: config.apiBase, credentials: 'include' })
+const raw = fetchBaseQuery({
+  baseUrl: new URL(config.apiBase, window.location.origin).href,
+  credentials: 'include',
+  redirect: 'error',
+})
 // Keep the masked CSRF token in memory. The cookie is managed by the browser and Django.
 // Keep `csrf` as an initially empty value.
 let csrf: string | undefined
 // Share a single in-flight CSRF bootstrap promise when several requests start together.
 // Keep `csrfRequest` as an initially empty value.
 let csrfRequest: Promise<string | undefined> | undefined
+// A result from an earlier session must not replace a newer session's in-memory token.
+let csrfGeneration = 0
 // Keep `baseQuery` as a callback that runs when it is called and returns a promise.
-const baseQuery: BaseQueryFn<
+export const baseQuery: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
 > = async (args, api, extra) => {
   // Endpoints may supply a short URL string or a full object containing URL, method, headers, and body.
   // Keep `request` as a choice between two values based on `typeof args === 'string'`.
-  const request = typeof args === 'string' ? { url: args } : args
+  const request: FetchArgs =
+    typeof args === 'string' ? { url: args } : { ...args }
+  // Reject absolute/off-prefix paths before sending cookies or a CSRF token anywhere.
+  try {
+    const destination = new URL(
+      request.url,
+      new URL(config.apiBase, window.location.origin),
+    )
+    if (
+      destination.origin !== window.location.origin ||
+      !destination.pathname.startsWith(config.apiBase) ||
+      destination.username ||
+      destination.password
+    )
+      return {
+        error: { status: 'CUSTOM_ERROR', error: 'Invalid API destination.' },
+      }
+    request.url =
+      destination.pathname.slice(config.apiBase.length) + destination.search
+  } catch {
+    return {
+      error: { status: 'CUSTOM_ERROR', error: 'Invalid API destination.' },
+    }
+  }
+  request.credentials = request.url.startsWith('shared/') ? 'omit' : 'include'
+  if (/^(?:me\/|auth\/)/.test(request.url)) request.cache = 'no-store'
   // A write such as POST, PUT, PATCH, or DELETE needs a CSRF header. A normal GET reads data.
   // Keep `unsafe` as the right-hand expression only when `request.method` is truthy.
   const unsafe =
@@ -42,25 +73,48 @@ const baseQuery: BaseQueryFn<
   if (unsafe || request.url === 'me/') {
     // Take this branch only when `!csrf` is truthy.
     if (!csrf) {
+      const generation = csrfGeneration
       // The nullish assignment starts this promise only when a bootstrap is not already running.
       // Update `csrfRequest` using the result returned by `(async () => { const r = await raw('auth/csrf/', api, extra) return (r.data as { csrf_token?: string } | un...` with these arguments.
       csrfRequest ??= (async () => {
         // Keep `r` as the completed result of `raw('auth/csrf/', api, extra)`; await pauses this async function until the promise settles.
         const r = await raw('auth/csrf/', api, extra)
         // Return the value read from `(r.data as { csrf_token?: string } | undefined)?.csrf_token` to the caller.
-        return (r.data as { csrf_token?: string } | undefined)?.csrf_token
+        const token = (r.data as { csrf_token?: unknown } | undefined)
+          ?.csrf_token
+        return typeof token === 'string' && token.length <= 256
+          ? token
+          : undefined
       })()
       // Wait for the shared result, then release the in-flight marker for future bootstrap attempts.
       // Update `csrf` using the completed result of `csrfRequest`; await pauses this async function until the promise settles.
-      csrf = await csrfRequest
+      const token = await csrfRequest
+      if (generation !== csrfGeneration)
+        return {
+          error: {
+            status: 'CUSTOM_ERROR',
+            error: 'The session changed. Please retry.',
+          },
+        }
+      csrf = token
       // Update `csrfRequest` using the value read from `undefined`.
       csrfRequest = undefined
     }
     // Add the masked token to a write request. Django checks it together with the CSRF cookie.
     // Take this branch only when `unsafe` is truthy.
-    if (unsafe)
+    if (unsafe && !csrf)
+      return {
+        error: {
+          status: 'CUSTOM_ERROR',
+          error: 'Could not prepare a secure request. Please retry.',
+        },
+      }
+    if (unsafe) {
       // Update `request.headers` using an object whose named fields are explained below.
-      request.headers = { ...request.headers, 'X-CSRFToken': csrf || '' }
+      const headers = new Headers(request.headers as HeadersInit | undefined)
+      headers.set('X-CSRFToken', csrf!)
+      request.headers = headers
+    }
   }
   // Send the actual endpoint request after its shared authentication headers are ready.
   // Keep `result` as the completed result of `raw(request, api, extra)`; await pauses this async function until the promise settles.
@@ -69,7 +123,12 @@ const baseQuery: BaseQueryFn<
   // Keep `token` as the value read from `(result.data as { csrf_token?: string } | undefined)?.csrf_token`.
   const token = (result.data as { csrf_token?: string } | undefined)?.csrf_token
   // Take this branch only when `token` is truthy.
-  if (token) csrf = token
+  if (
+    request.url === 'auth/login/' &&
+    typeof token === 'string' &&
+    token.length <= 256
+  )
+    csrf = token
   // Take this branch only when `request.url === 'auth/logout/' && !result.error` is truthy.
   if (request.url === 'auth/logout/' && !result.error) csrf = undefined
   // Return the value read from `result` to the caller.
@@ -91,4 +150,6 @@ export const baseApi = createApi({
 export function resetCsrf() {
   // Update `csrf` using the value read from `undefined`.
   csrf = undefined
+  csrfRequest = undefined
+  csrfGeneration++
 }

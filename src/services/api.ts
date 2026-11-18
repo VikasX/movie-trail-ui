@@ -9,7 +9,8 @@
 // Bring in the exported helpers/components from `./base-api`.
 import { baseApi } from './base-api'
 // Bring in the exported helpers/components from `./pagination`.
-import { fetchComplete, fetchCollection } from './pagination'
+import { fetchComplete, fetchCollection, PAGE_SIZE } from './pagination'
+import { collectionPath, shareToken } from '@/lib/security'
 // Bring in the exported helpers/components from `@/types/models`.
 import {
   titleKey,
@@ -41,7 +42,7 @@ export function queryString(
 }
 // Keep `pageParams` as a callback that runs when it is called.
 const pageParams = (page = 1, snapshot?: string) =>
-  queryString({ page, page_size: 100, snapshot })
+  queryString({ page, page_size: PAGE_SIZE, snapshot })
 // b.query<ResponseType, ArgumentType> describes what comes back and what the caller supplies.
 // providesTags labels cached reads. invalidatesTags tells subscribed reads to refresh after a change.
 // Keep `api` as the result returned by `baseApi.injectEndpoints` with these arguments.
@@ -219,10 +220,7 @@ export const api = baseApi.injectEndpoints({
     >({
       // Use custom request logic to combine data before returning one endpoint result.
       queryFn: (p, _api, _extra, fetchPage) =>
-        fetchCollection(
-          'me/collections/' + encodeURIComponent(p.id) + '/',
-          fetchPage,
-        ),
+        fetchCollection(collectionPath(p.id), fetchPage),
       // Label these cached results so related changes can refresh them.
       providesTags: ['Collections'],
     }),
@@ -245,8 +243,8 @@ export const api = baseApi.injectEndpoints({
     >({
       // Build the endpoint address and request options from the caller input.
       query: ({ id, name }) => ({
-        // Set the `url` field to the expression `'me/collections/' + id + '/'`.
-        url: 'me/collections/' + id + '/',
+        // Validate and encode the collection identity before building this request path.
+        url: collectionPath(id),
         // The HTTP operation used by this request.
         method: 'PATCH',
         // The JSON request content sent to the backend.
@@ -259,7 +257,7 @@ export const api = baseApi.injectEndpoints({
     // Set the `deleteCollection` field to the result returned by `b.mutation` with these arguments.
     deleteCollection: b.mutation<void, string>({
       // Build the endpoint address and request options from the caller input.
-      query: (id) => ({ url: 'me/collections/' + id + '/', method: 'DELETE' }),
+      query: (id) => ({ url: collectionPath(id), method: 'DELETE' }),
       // Mark related cached reads for refresh after this operation.
       invalidatesTags: ['Collections', 'Public'],
     }),
@@ -271,8 +269,8 @@ export const api = baseApi.injectEndpoints({
     >({
       // Build the endpoint address and request options from the caller input.
       query: ({ id, title, remove }) => ({
-        // Set the `url` field to the expression `'me/collections/' + id + '/items/' + titlePath(title) + '/'`.
-        url: 'me/collections/' + id + '/items/' + titlePath(title) + '/',
+        // Keep the collection ID inside one validated path segment, then append the title identity.
+        url: collectionPath(id) + 'items/' + titlePath(title) + '/',
         // The HTTP operation used by this request.
         method: remove ? 'DELETE' : 'PUT',
       }),
@@ -287,8 +285,8 @@ export const api = baseApi.injectEndpoints({
     >({
       // Build the endpoint address and request options from the caller input.
       query: ({ id, enabled }) => ({
-        // Set the `url` field to the expression `'me/collections/' + id + '/sharing/'`.
-        url: 'me/collections/' + id + '/sharing/',
+        // Build the sharing path from a validated collection identity.
+        url: collectionPath(id) + 'sharing/',
         // The HTTP operation used by this request.
         method: enabled ? 'PUT' : 'DELETE',
       }),
@@ -303,10 +301,10 @@ export const api = baseApi.injectEndpoints({
     >({
       // Build the endpoint address and request options from the caller input.
       query: (p) => ({
-        // Set the `url` field to the expression `'shared/' + encodeURIComponent(p.token) + '/?' + pageParams(p.page, p.snapshot)`.
+        // Only a bounded URL-safe token may occupy the public share path segment.
         url:
           'shared/' +
-          encodeURIComponent(p.token) +
+          shareToken(p.token) +
           '/?' +
           pageParams(p.page, p.snapshot),
         // The browser cookie policy for this request.

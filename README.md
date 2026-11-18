@@ -4,6 +4,8 @@ A responsive movie and TV discovery frontend built with React, strict TypeScript
 
 For a beginner-friendly explanation of how the files work together, read [Understanding CineScope](docs/FRONTEND_GUIDE.md). It includes a reading order, click-to-data walkthroughs, TypeScript examples, and a file-by-file reference. The handwritten source files also contain explanations beside the relevant logic.
 
+See the [frontend security audit](docs/SECURITY_AUDIT.md) for hardening changes, verification evidence, remaining dependency findings, and deployment/backend follow-up.
+
 ## Run locally
 
 Use Node.js 20.19+ or 22.12+ and npm.
@@ -20,11 +22,11 @@ Open the URL Vite prints, normally http://localhost:5173. The default is mock mo
 
 `.env.example` includes commented local and deployed URL options. Copy it to `.env.local`, select the values, then restart Vite. Vite embeds public `VITE_*` values at build time, so redeploy when those values change.
 
-- `VITE_API_MODE=mock` starts MSW before React mounts. `live` uses Django directly through the configured API prefix.
-- `VITE_API_BASE_URL=/api/v1/` is the recommended browser API prefix for both local and deployed environments.
+- `VITE_API_MODE=mock` starts MSW before React mounts. `live` uses Django through the same-origin proxy.
+- `VITE_API_BASE_URL=/api/v1/` is the browser API prefix for both local and deployed environments. Invalid or cross-origin values fall back to this prefix.
 - `API_PROXY_TARGET=http://localhost:8000` directs Vite's `/api` and `/accounts` development proxy to local Django. A commented option points to `https://movie-trail-py.vercel.app`.
 - `VITE_APP_URL` may be blank to use the current origin, or set to `http://localhost:5173` or `https://movie-trail-ui.vercel.app` for demo share URLs.
-- Direct backend API URL options are provided for catalogue testing. Session authentication between unrelated Vercel domains uses the same-origin proxy described in the contract.
+- Keep browser API calls on the same-origin proxy. Switch local/deployed backend targets using the commented `API_PROXY_TARGET` options.
 
 Backend documentation is at https://movie-trail-py.vercel.app/api/docs. The product API prefix is `/api/v1/`.
 

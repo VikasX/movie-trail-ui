@@ -21,6 +21,7 @@ export default defineConfig({
     // Run component tests with a simulated document/window, even though Vitest itself runs in Node.
     // Set the `environment` field to the text `'jsdom'`.
     environment: 'jsdom',
+    environmentOptions: { jsdom: { url: 'http://localhost/' } },
     // Install shared DOM assertions and browser substitutes before each test module runs.
     // Set the `setupFiles` field to an array containing these ordered values.
     setupFiles: ['./src/test/setup.ts'],

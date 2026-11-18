@@ -60,6 +60,14 @@ const slice = createSlice({
   reducers: {
     // Store the public user profile after session checks or login. Passing null switches the visible app to guest mode.
     setUser(s, a: PayloadAction<User | null>) {
+      // A different account/session must not inherit dialogs referencing the previous account's records.
+      if (s.user?.id !== a.payload?.id) {
+        s.trailer = null
+        s.collection = null
+        s.save = null
+        s.share = null
+        s.sync = false
+      }
       // Update `s.user` using the value read from `a.payload`.
       s.user = a.payload
     },

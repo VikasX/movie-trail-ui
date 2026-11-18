@@ -45,6 +45,32 @@ function destinationFor(
 
 // Group the related behavior tests under this description.
 describe('Vercel API and SPA route separation', () => {
+  it('applies browser protections to frontend documents without overriding OAuth/API headers', () => {
+    const rule = config.headers[0]
+    const { routes, error } = getTransformedRoutes({ headers: [rule] })
+    expect(error).toBeNull()
+    const route = routes?.find((r) => 'src' in r)
+    expect(
+      route && 'src' in route && new RegExp(route.src!).test('/discover'),
+    ).toBe(true)
+    for (const path of ['/api/v1/titles/', '/accounts/google/login/callback/'])
+      expect(route && 'src' in route && new RegExp(route.src!).test(path)).toBe(
+        false,
+      )
+    const headers = Object.fromEntries(
+      rule.headers.map((h: { key: string; value: string }) => [h.key, h.value]),
+    )
+    expect(headers['X-Content-Type-Options']).toBe('nosniff')
+    expect(headers['X-Frame-Options']).toBe('DENY')
+    expect(headers['Referrer-Policy']).toBe('no-referrer')
+    const csp = headers['Content-Security-Policy']
+    expect(csp).toContain("script-src 'self'")
+    expect(csp).toContain("frame-ancestors 'none'")
+    expect(csp).toContain('https://www.youtube-nocookie.com')
+    expect(csp).toContain('https://image.tmdb.org')
+    expect(csp).not.toContain('unsafe-eval')
+    expect(csp).not.toContain(' *')
+  })
   // Exercise the behavior described by this test name.
   it('reproduces the old wildcard failing on Django trailing slashes', () => {
     // Keep `{ routes, error }` as the result returned by `getTransformedRoutes` with these arguments.

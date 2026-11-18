@@ -13,6 +13,7 @@ import { Link, useParams, useSearchParams } from 'react-router'
 import { Plus, Folder, Layers, ArrowLeft, Pencil, Share2 } from 'lucide-react'
 // Bring in the exported helpers/components from `@/hooks/use-library`.
 import { useLibrary, errorMessage } from '@/hooks/use-library'
+import { pageFromUrl } from '@/lib/security'
 // Bring in the exported helpers/components from `@/hooks/redux`.
 import { useAppDispatch } from '@/hooks/redux'
 // Bring in the exported helpers/components from `@/store/ui-slice`.
@@ -522,14 +523,18 @@ export function CollectionPage() {
           className="button secondary"
           onClick={
             /* React calls this callback when the control is clicked. The arrow body below performs the action. */ () => {
-              // Keep `u` as a new URL instance initialized with these arguments.
-              const u = new URL(result.data!.items.next!)
+              // Parse validated paging values; malformed API URLs cannot escape this click handler.
+              const u = pageFromUrl(result.data!.items.next!)
+              if (!u) {
+                toast.error('This selection could not be loaded. Please retry.')
+                return
+              }
               // Call `setPaging` with `{ page: Number(u.searchParams.get('page')), snapshot: u.searchParams.get('snapshot') || undefined, }` to update its state or routed value.
               setPaging({
                 // Set the `page` field to the result returned by `Number` with these arguments.
-                page: Number(u.searchParams.get('page')),
+                page: u.page,
                 // The server token retaining the same selection across pages.
-                snapshot: u.searchParams.get('snapshot') || undefined,
+                snapshot: u.snapshot,
               })
             }
           }

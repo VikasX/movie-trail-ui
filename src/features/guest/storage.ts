@@ -6,7 +6,7 @@
  * See docs/FRONTEND_GUIDE.md for the plain-language walkthrough.
  */
 // Runtime schemas that validate values rather than relying only on TypeScript.
-import { z } from 'zod'
+import { z } from '@/lib/validation'
 // Bring in compile-time types from `@/types/models`.
 import type {
   LibraryData,
@@ -19,35 +19,40 @@ import type {
 // Bring in the exported helpers/components from `@/types/models`.
 import { titleKey } from '@/types/models'
 
+// These bounds match guest feature limits and cap JSON parsing/validation work.
+export const MAX_GUEST_BYTES = 4_000_000
+
 // Validate the smallest title identity stored in collection memberships.
 // Keep `ref` as the Zod validation rule `z.object({ media_type: z.enum(['movie', 'tv']), tmdb_id: z.number().int().positive(), })`.
 const ref = z.object({
   // Whether the identity belongs to a movie or a TV series.
   media_type: z.enum(['movie', 'tv']),
   // The numeric TMDB identifier, paired with media_type to identify a title.
-  tmdb_id: z.number().int().positive(),
+  tmdb_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
 })
 // Save display metadata too, allowing a guest card to render after a refresh or a different search.
 // Keep `title` as the result returned by `ref.extend` with these arguments.
 const title = ref.extend({
   // The title record or display title used by this object.
-  title: z.string(),
+  title: z.string().max(1000),
   // The title in its original language.
-  original_title: z.string(),
+  original_title: z.string().max(1000),
   // The synopsis shown in title details.
-  overview: z.string(),
+  overview: z.string().max(20000),
   // The release year, which can be missing.
   year: z.number().nullable(),
   // The release date supplied by the catalogue.
-  release_date: z.string().nullable(),
+  release_date: z.string().max(64).nullable(),
   // The portrait image URL used on cards.
-  poster_url: z.string().nullable(),
+  poster_url: z.string().max(2048).nullable(),
   // The wide image URL used for title backgrounds.
-  backdrop_url: z.string().nullable(),
+  backdrop_url: z.string().max(2048).nullable(),
   // The genre values used for filtering or display.
-  genres: z.array(z.object({ key: z.string(), name: z.string() })),
+  genres: z
+    .array(z.object({ key: z.string().max(80), name: z.string().max(100) }))
+    .max(50),
   // The original-language code used by the API.
-  original_language: z.string(),
+  original_language: z.string().max(16),
   // The catalogue rating, which may be unavailable.
   rating: z.number().nullable(),
   // The number of votes behind the rating.
@@ -63,51 +68,55 @@ const title = ref.extend({
 })
 // This runtime schema checks the entire document read from localStorage. TypeScript types alone cannot check saved JSON.
 // Keep `storageSchema` as the Zod validation rule `z.object({ version: z.literal(1), guest_id: z.uuid(), saved: z.array( z.object({ title, watched: z.boolean(...`.
-const storageSchema = z.object({
+export const storageSchema = z.object({
   // The local storage format version, used when validating the saved document.
   version: z.literal(1),
   // The identity of this browser guest library.
   guest_id: z.uuid(),
   // The saved-title rows kept for this guest library.
-  saved: z.array(
-    z.object({
-      // Use the existing `title` variable as the field with the same name.
-      title,
-      // Whether this saved title has been marked watched.
-      watched: z.boolean(),
-      // The time the title was added to saved titles.
-      saved_at: z.iso.datetime(),
-      // The time it was marked watched, or null when unwatched.
-      watched_at: z.iso.datetime().nullable(),
-    }),
-  ),
+  saved: z
+    .array(
+      z.object({
+        // Use the existing `title` variable as the field with the same name.
+        title,
+        // Whether this saved title has been marked watched.
+        watched: z.boolean(),
+        // The time the title was added to saved titles.
+        saved_at: z.iso.datetime(),
+        // The time it was marked watched, or null when unwatched.
+        watched_at: z.iso.datetime().nullable(),
+      }),
+    )
+    .max(500),
   // The collections belonging to this data object.
-  collections: z.array(
-    z.object({
-      // Set the `id` field to the Zod validation rule `z.string()`.
-      id: z.string(),
-      // Set the `name` field to the Zod validation rule `z.string()`.
-      name: z.string(),
-      // The collection kind, distinguishing editable custom groups from computed automatic groups.
-      kind: z.literal('custom'),
-      // The member records contained in this group or paginated response.
-      items: z.array(ref),
-      // The descriptive text associated with this value.
-      description: z.string().optional(),
-      // The number of members reported for this collection.
-      item_count: z.number(),
-      // The record creation time.
-      created_at: z.string().nullable(),
-      // The most recent record-update time.
-      updated_at: z.string().nullable(),
-      // Whether this collection currently has public sharing enabled.
-      sharing_enabled: z.boolean(),
-      // The public link, or null when no link is available.
-      share_url: z.string().nullable(),
-    }),
-  ),
+  collections: z
+    .array(
+      z.object({
+        // Guest-created custom collection identities must be UUIDs.
+        id: z.uuid(),
+        // Stored collection names obey the same nonempty/length limits as the form.
+        name: z.string().min(1).max(80),
+        // The collection kind, distinguishing editable custom groups from computed automatic groups.
+        kind: z.literal('custom'),
+        // The member records contained in this group or paginated response.
+        items: z.array(ref).max(500),
+        // The descriptive text associated with this value.
+        description: z.string().max(500).optional(),
+        // The number of members reported for this collection.
+        item_count: z.number(),
+        // The record creation time.
+        created_at: z.string().max(64).nullable(),
+        // The most recent record-update time.
+        updated_at: z.string().max(64).nullable(),
+        // Whether this collection currently has public sharing enabled.
+        sharing_enabled: z.boolean(),
+        // The public link, or null when no link is available.
+        share_url: z.string().max(2048).nullable(),
+      }),
+    )
+    .max(20),
   // Recently explored titles, maintained separately from saved titles.
-  recent: z.array(z.object({ title, explored_at: z.string() })),
+  recent: z.array(z.object({ title, explored_at: z.string().max(64) })).max(50),
 })
 // The version is part of the key and the document. Future storage formats can use a new version deliberately.
 // Keep `GUEST_KEY` as the text `'cinescope:guest:v1'`.
@@ -136,9 +145,10 @@ export function readLibrary(
   try {
     // JSON.parse checks JSON syntax. safeParse then checks field types and returns a success/failure result.
     // Keep `parsed` as a Zod validation result containing either validated data or validation errors.
-    const parsed = storageSchema.safeParse(
-      JSON.parse(localStorage.getItem(key) || 'null'),
-    )
+    const raw = localStorage.getItem(key)
+    // Bound parsing work before decoding untrusted browser text. Leave invalid originals untouched for recovery.
+    if (!raw || raw.length > MAX_GUEST_BYTES) return emptyLibrary()
+    const parsed = storageSchema.safeParse(JSON.parse(raw))
     // Take this branch only when `parsed.success` is truthy.
     if (parsed.success) return parsed.data
   } catch {
@@ -153,7 +163,10 @@ export function persistLibrary(
   /* The lookup/storage key; a default below is used when omitted. Omitting this input uses the default shown after =. */ key = GUEST_KEY,
 ) {
   // Persist this key/value pair in localStorage; the data argument is serialized where needed.
-  localStorage.setItem(key, JSON.stringify(data))
+  const serialized = JSON.stringify(storageSchema.parse(data))
+  if (serialized.length > MAX_GUEST_BYTES)
+    throw new Error('Your guest library is too large to save in this browser.')
+  localStorage.setItem(key, serialized)
 }
 /** Save a title once and optionally change its watched status while preserving its original save time. */
 export function saveTitle(
@@ -315,6 +328,32 @@ export function syncPayload(
         tmdb_id: t.tmdb_id,
       })),
     })),
+  }
+}
+
+/** Validate a retry snapshot before using sessionStorage data in an authenticated import. */
+export function readSyncJob(raw: string | null, owner: number) {
+  if (!raw || raw.length > MAX_GUEST_BYTES * 2) return undefined
+  try {
+    const parsed = z
+      .object({
+        owner: z.number().int().positive(),
+        snapshot: storageSchema,
+        payload: z.object({ sync_id: z.uuid() }).passthrough(),
+      })
+      .parse(JSON.parse(raw))
+    if (parsed.owner !== owner) return undefined
+    // Reconstruct only contract fields from the validated snapshot, retaining the original retry ID.
+    const payload = {
+      ...syncPayload(parsed.snapshot),
+      sync_id: parsed.payload.sync_id,
+    }
+    for (const key of ['guest_id', 'saved_titles', 'collections'] as const)
+      if (JSON.stringify(payload[key]) !== JSON.stringify(parsed.payload[key]))
+        return undefined
+    return { owner, snapshot: parsed.snapshot, payload }
+  } catch {
+    return undefined
   }
 }
 /** Keep rejected records and new edits, clearing only accepted records that still match the submitted snapshot. */
