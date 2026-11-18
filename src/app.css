@@ -1,69 +1,127 @@
+/*
+CineScope styling. Read docs/FRONTEND_GUIDE.md for how CSS classes connect to TSX.
+Theme variables and common controls come first, followed by screens and responsive rules.
+*/
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 @theme inline {
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --font-sans: 'Inter Variable', sans-serif;
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-background: var(--background);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-foreground: var(--foreground);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-card: var(--card);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-card-foreground: var(--foreground);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-popover: var(--card);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-popover-foreground: var(--foreground);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-primary: var(--primary);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-primary-foreground: #002b4d;
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-secondary: var(--secondary);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-secondary-foreground: var(--foreground);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-muted: var(--secondary);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-muted-foreground: var(--muted);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-accent: var(--secondary);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-accent-foreground: var(--foreground);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-border: var(--border);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-input: var(--border);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-ring: var(--primary);
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --color-destructive: #ffb4ab;
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --radius-lg: 0.75rem;
+  /* Expose this reusable theme token to the stylesheet/Tailwind utilities. */
   --radius-md: 0.5rem;
 }
+/* Dark theme values. Components refer to these CSS variables so colours can be changed centrally. */
 :root {
+  /* Tell the browser which theme to use for its native controls. */
   color-scheme: dark;
+  /* Define the page background for this theme. */
   --background: #111319;
+  /* Define the main text colour for this theme. */
   --foreground: #e2e2ea;
+  /* Define the card/surface background for this theme. */
   --card: #191b22;
+  /* Define secondary surfaces for this theme. */
   --secondary: #24272f;
+  /* Define less prominent text for this theme. */
   --muted: #a5aab5;
+  /* Define shared borders for this theme. */
   --border: #30343e;
+  /* Define the primary accent for this theme. */
   --primary: #9fcaff;
+  /* Define filled blue controls for this theme. */
   --blue-fill: #6494ca;
 }
+/* The light class on the html element overrides the same variables for light mode. */
 :root.light {
+  /* Tell the browser which theme to use for its native controls. */
   color-scheme: light;
+  /* Define the page background for this theme. */
   --background: #f5f6f9;
+  /* Define the main text colour for this theme. */
   --foreground: #20252e;
+  /* Define the card/surface background for this theme. */
   --card: #fff;
+  /* Define secondary surfaces for this theme. */
   --secondary: #e6eaf0;
+  /* Define less prominent text for this theme. */
   --muted: #586270;
+  /* Define shared borders for this theme. */
   --border: #d4dbe4;
+  /* Define the primary accent for this theme. */
   --primary: #2d6194;
+  /* Define filled blue controls for this theme. */
   --blue-fill: #5485bc;
 }
+/* Shared sizing and border defaults apply before the component-specific rules below. */
 * {
+  /* Use border-box sizing so declared dimensions include padding and borders. */
   box-sizing: border-box;
+  /* Set the colour used by this element’s borders. */
   border-color: var(--border);
 }
+/* Default page background, text colour, font, size, and line spacing. */
 body {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
+  /* Paint this element’s background colour or image. */
   background: var(--background);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
+  /* Choose the typeface and fallback fonts. */
   font-family: 'Inter Variable', sans-serif;
+  /* Set the text size. */
   font-size: 14px;
+  /* Set the vertical spacing of text lines. */
   line-height: 1.6;
 }
+/* Form elements inherit the surrounding typography for consistent controls. */
 button,
+/* Shared field appearance. Each form supplies its own label and validation message. */
 input,
 select,
 textarea {
+  /* Set/inherit the font properties together. */
   font: inherit;
 }
 button,
@@ -71,652 +129,1088 @@ a,
 input,
 select,
 textarea {
+  /* Choose the tap highlight used by supporting mobile browsers. */
   -webkit-tap-highlight-color: transparent;
 }
 button,
 a {
+  /* Tell the browser which touch gestures it may handle natively. */
   touch-action: manipulation;
 }
 button {
+  /* Choose the mouse pointer shown over this element. */
   cursor: pointer;
 }
 button:disabled {
+  /* Choose the mouse pointer shown over this element. */
   cursor: wait;
+  /* Set transparency, where 1 is fully visible and 0 is transparent. */
   opacity: 0.5;
 }
+/* Visible outlines help keyboard users locate the focused control. */
 button:focus-visible,
 a:focus-visible {
+  /* Draw an outline without consuming layout space, such as a keyboard-focus indicator. */
   outline: 2px solid var(--primary);
+  /* Set the distance between the element and its outline. */
   outline-offset: 4px;
 }
 a {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: inherit;
+  /* Set or remove text decoration such as link underlining. */
   text-decoration: none;
 }
 h1,
 h2,
 h3 {
+  /* Choose the typeface and fallback fonts. */
   font-family: Outfit, sans-serif;
+  /* Set the vertical spacing of text lines. */
   line-height: 1.2;
+  /* Set how light or bold the text appears. */
   font-weight: 500;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
 }
 h1 {
+  /* Set the text size. */
   font-size: 40px;
+  /* Adjust the space between adjacent characters. */
   letter-spacing: -1.2px;
 }
 h2 {
+  /* Set the text size. */
   font-size: 25px;
+  /* Adjust the space between adjacent characters. */
   letter-spacing: -0.4px;
 }
 h3 {
+  /* Set the text size. */
   font-size: 18px;
 }
 p {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 10px 0 18px;
 }
 small,
 .small {
+  /* Set the text size. */
   font-size: 12px;
 }
 input,
 select,
 textarea {
+  /* Set the smallest allowed width; zero lets flex/grid content shrink. */
   min-width: 0;
+  /* Paint this element’s background colour or image. */
   background: var(--background);
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Round the corners by the specified amount. */
   border-radius: 8px;
+  /* Set the space inside this element between its content and border. */
   padding: 11px 12px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
+  /* Draw an outline without consuming layout space, such as a keyboard-focus indicator. */
   outline: none;
 }
 input:focus,
 select:focus,
 textarea:focus {
+  /* Set the colour used by this element’s borders. */
   border-color: var(--primary);
+  /* Draw the specified shadow around or inside this element. */
   box-shadow: 0 0 0 2px #9fcaff15;
 }
 input[type='checkbox'] {
+  /* Set the highlight colour of browser-rendered checkboxes and similar controls. */
   accent-color: var(--blue-fill);
+  /* Set the element’s width. */
   width: 17px;
+  /* Set the element’s height. */
   height: 17px;
 }
 label {
+  /* Set the text size. */
   font-size: 13px;
 }
 label input,
 label select,
 label textarea {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: block;
+  /* Set the element’s width. */
   width: 100%;
+  /* Set the outside space above this element. */
   margin-top: 7px;
 }
+/* Common text treatments used across pages. */
 .muted {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
 .active {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary) !important;
 }
 .eyebrow {
+  /* Set the text size. */
   font-size: 11px;
+  /* Set how light or bold the text appears. */
   font-weight: 600;
+  /* Adjust the space between adjacent characters. */
   letter-spacing: 2px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
 }
+/* Shared button layout. primary, secondary, and danger rules below provide different visual roles. */
 .button {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: inline-flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 9px;
+  /* Round the corners by the specified amount. */
   border-radius: 8px;
+  /* Set the space inside this element between its content and border. */
   padding: 11px 18px;
+  /* Set the text size. */
   font-size: 13px;
+  /* Set how light or bold the text appears. */
   font-weight: 500;
+  /* Keep the element at least this tall. */
   min-height: 43px;
+  /* Set border width, line style, and colour together. */
   border: 1px solid transparent;
+  /* Animate changes to the named properties using the specified duration/easing. */
   transition: background 0.18s;
 }
 .primary {
+  /* Paint this element’s background colour or image. */
   background: var(--blue-fill);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #071c30;
 }
 .primary:hover {
+  /* Paint this element’s background colour or image. */
   background: #8bb5e5;
 }
 .secondary {
+  /* Paint this element’s background colour or image. */
   background: var(--secondary);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
+  /* Set the colour used by this element’s borders. */
   border-color: var(--border);
 }
 .secondary:hover {
+  /* Paint this element’s background colour or image. */
   background: var(--border);
 }
 .danger {
+  /* Paint this element’s background colour or image. */
   background: #9c3d45;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: white;
 }
 .danger-text {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #ffb4ab !important;
 }
 .text-button {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: inline-flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 7px;
+  /* Paint this element’s background colour or image. */
   background: none;
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
+  /* Set the space inside this element between its content and border. */
   padding: 6px 0;
+  /* Set the text size. */
   font-size: 13px;
 }
+/* A small reusable click target for icon-only actions such as close, save, and menu. */
 .icon-button {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: inline-flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Paint this element’s background colour or image. */
   background: transparent;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Round the corners by the specified amount. */
   border-radius: 7px;
+  /* Set the smallest allowed width; zero lets flex/grid content shrink. */
   min-width: 32px;
+  /* Keep the element at least this tall. */
   min-height: 34px;
+  /* Set the space inside this element between its content and border. */
   padding: 6px;
 }
 .icon-button:hover {
+  /* Paint this element’s background colour or image. */
   background: var(--secondary);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
 }
 .inline-actions {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 8px;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Control whether flex children may move onto another row. */
   flex-wrap: wrap;
 }
+/* Limit the page width and provide horizontal/vertical spacing around routed content. */
 .container {
+  /* Limit how wide the element may become. */
   max-width: 1440px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: auto;
+  /* Set the space inside this element between its content and border. */
   padding: 42px 48px 65px;
 }
+/* Sticky application header and desktop/mobile navigation layout. */
 .app-header {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: sticky;
+  /* Set the top offset for this positioned element. */
   top: 0;
+  /* Paint this element’s background colour or image. */
   background: color-mix(in srgb, var(--background) 94%, transparent);
+  /* Apply a visual effect to the content behind this translucent element. */
   backdrop-filter: blur(16px);
+  /* Set the stacking level within the applicable stacking context. */
   z-index: 20;
+  /* Set the lower separating border. */
   border-bottom: 1px solid var(--border);
 }
 .header-inner {
+  /* Limit how wide the element may become. */
   max-width: 1440px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: auto;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 44px;
+  /* Set the space inside this element between its content and border. */
   padding: 16px 48px;
+  /* Keep the element at least this tall. */
   min-height: 74px;
 }
 .brand {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 10px;
+  /* Choose the typeface and fallback fonts. */
   font-family: Outfit, sans-serif;
+  /* Set the text size. */
   font-size: 22px;
+  /* Control text wrapping and preservation of spaces/newlines. */
   white-space: nowrap;
 }
 .brand svg {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
 }
 .desktop-nav {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 28px;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Set the text size. */
   font-size: 13px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
 .desktop-nav a:hover {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
 }
 .header-actions {
+  /* Set the outside space on the left. */
   margin-left: auto;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 14px;
 }
 .session-badge {
+  /* Set the space inside this element between its content and border. */
   padding: 6px 12px;
+  /* Round the corners by the specified amount. */
   border-radius: 30px;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Control text wrapping and preservation of spaces/newlines. */
   white-space: nowrap;
 }
 .mobile-menu {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: none;
 }
 .mobile-nav {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 20px;
+  /* Set the space inside this element between its content and border. */
   padding: 15px 24px;
+  /* Set the upper separating border. */
   border-top: 1px solid var(--border);
 }
 .app-main {
+  /* Keep the element at least this tall. */
   min-height: 72vh;
 }
+/* Shared footer layout and attribution text. */
 .app-footer {
+  /* Limit how wide the element may become. */
   max-width: 1440px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: auto;
+  /* Set the space inside this element between its content and border. */
   padding: 28px 48px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 14px;
+  /* Control whether flex children may move onto another row. */
   flex-wrap: wrap;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the upper separating border. */
   border-top: 1px solid var(--border);
 }
 .app-footer p {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
 }
 .app-footer a {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
 }
+/* Discover page title and central search area. */
 .discovery-intro {
+  /* Align inline text within the element. */
   text-align: center;
+  /* Set the space inside this element between its content and border. */
   padding: 26px 0 32px;
 }
 .discovery-intro h1 {
+  /* Set the text size. */
   font-size: 44px;
+  /* Set how light or bold the text appears. */
   font-weight: 400;
 }
 .discovery-intro > p:not(.eyebrow) {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the text size. */
   font-size: 15px;
 }
+/* Search input, search icon, clear control, and keyboard shortcut hint. */
 .search-box {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 14px;
+  /* Limit how wide the element may become. */
   max-width: 740px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 26px auto 0;
+  /* Set the space inside this element between its content and border. */
   padding: 5px 16px;
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Round the corners by the specified amount. */
   border-radius: 12px;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Draw the specified shadow around or inside this element. */
   box-shadow: 0 6px 25px #00000010;
 }
 .search-box > svg {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
+  /* Control whether this child may shrink when the container has limited space. */
   flex-shrink: 0;
 }
 .search-box input {
+  /* Set how this child grows, shrinks, and chooses its starting size within a flex container. */
   flex: 1;
+  /* Set the smallest allowed width; zero lets flex/grid content shrink. */
   min-width: 0;
+  /* Paint this element’s background colour or image. */
   background: none;
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Draw the specified shadow around or inside this element. */
   box-shadow: none;
+  /* Set the space inside this element between its content and border. */
   padding: 15px 0;
+  /* Set the text size. */
   font-size: 14px;
 }
 .search-box kbd {
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Paint this element’s background colour or image. */
   background: var(--secondary);
+  /* Set the space inside this element between its content and border. */
   padding: 3px 6px;
+  /* Round the corners by the specified amount. */
   border-radius: 4px;
+  /* Control text wrapping and preservation of spaces/newlines. */
   white-space: nowrap;
 }
+/* People-search opt-in and the suggestion list shown beneath it. */
 .search-people {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 8px;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the outside space above this element. */
   margin-top: 13px;
+  /* Set the text size. */
   font-size: 12px;
 }
 .search-people input {
+  /* Set the element’s width. */
   width: 14px;
+  /* Set the element’s height. */
   height: 14px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
 }
 .person-results {
+  /* Limit how wide the element may become. */
   max-width: 740px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 15px auto;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Set the space inside this element between its content and border. */
   padding: 15px;
+  /* Round the corners by the specified amount. */
   border-radius: 10px;
 }
 .person-results > div {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Set the space inside this element between its content and border. */
   padding: 8px;
 }
+/* The grouped discovery controls, including media tabs and advanced filter fields. */
 .filter-panel {
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Round the corners by the specified amount. */
   border-radius: 12px;
+  /* Set the space inside this element between its content and border. */
   padding: 22px 24px;
 }
 .filter-top,
 .filter-bottom {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 14px;
+  /* Control whether flex children may move onto another row. */
   flex-wrap: wrap;
 }
 .segmented {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 4px;
+  /* Set the space inside this element between its content and border. */
   padding: 4px;
+  /* Round the corners by the specified amount. */
   border-radius: 8px;
+  /* Paint this element’s background colour or image. */
   background: var(--background);
 }
 .segmented button {
+  /* Paint this element’s background colour or image. */
   background: none;
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the space inside this element between its content and border. */
   padding: 8px 18px;
+  /* Round the corners by the specified amount. */
   border-radius: 6px;
+  /* Set the text size. */
   font-size: 13px;
 }
 .segmented button[aria-pressed='true'] {
+  /* Paint this element’s background colour or image. */
   background: var(--blue-fill);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #071c30;
 }
 .tool-actions {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 10px;
 }
 .genre-row {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Control whether flex children may move onto another row. */
   flex-wrap: wrap;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 8px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 22px 0 18px;
 }
+/* Compact pills used for genres, metadata, and selectable options. */
 .chip {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: inline-flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 5px;
+  /* Set the space inside this element between its content and border. */
   padding: 6px 12px;
+  /* Round the corners by the specified amount. */
   border-radius: 30px;
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Paint this element’s background colour or image. */
   background: var(--secondary);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the text size. */
   font-size: 12px;
 }
 .chip.selected {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
+  /* Set the colour used by this element’s borders. */
   border-color: var(--primary);
+  /* Paint this element’s background colour or image. */
   background: #6494ca18;
 }
 .filter-bottom {
+  /* Set the upper separating border. */
   border-top: 1px solid var(--border);
+  /* Set the inside space above the content. */
   padding-top: 12px;
+  /* Set the text size. */
   font-size: 11px;
 }
 .filter-bottom > span {
+  /* Set the outside space on the right. */
   margin-right: auto;
 }
+/* Additional filters use a grid that becomes fewer columns on narrow screens. */
 .advanced-grid {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Define the number and sizing of the grid’s columns. */
   grid-template-columns: repeat(4, 1fr);
+  /* Add spacing between adjacent grid/flex children. */
   gap: 18px;
+  /* Set the outside space above this element. */
   margin-top: 22px;
 }
+/* Consistent space and heading layout for page sections and rails. */
 .section {
+  /* Set the outside space above this element. */
   margin-top: 44px;
 }
 .section-heading {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 20px;
+  /* Set the outside space below this element. */
   margin-bottom: 23px;
 }
 .section-heading h2 {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 11px;
 }
 .section-heading h2 svg {
+  /* Set the element’s width. */
   width: 21px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
 }
 .section-heading p {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 7px 0 0;
 }
+/* The main responsive poster grid. Media rules below change its column count. */
 .movie-grid {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Define the number and sizing of the grid’s columns. */
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Add spacing between adjacent grid/flex children. */
   gap: 24px;
 }
+/* Reusable title card surface and hover border. */
 .movie-card {
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Set border width, line style, and colour together. */
   border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  /* Round the corners by the specified amount. */
   border-radius: 12px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
+  /* Set the smallest allowed width; zero lets flex/grid content shrink. */
   min-width: 0;
+  /* Animate changes to the named properties using the specified duration/easing. */
   transition: border-color 0.2s;
 }
 .movie-card:hover {
+  /* Set the colour used by this element’s borders. */
   border-color: #6494ca80;
 }
+/* The card image keeps a two-to-three poster aspect ratio and positions its overlays. */
 .poster {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: block;
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: relative;
+  /* Set the element’s width. */
   width: 100%;
+  /* Keep this width-to-height ratio as the element resizes. */
   aspect-ratio: 2/3;
+  /* Paint this element’s background colour or image. */
   background: var(--secondary);
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Set the space inside this element between its content and border. */
   padding: 0;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
 }
 .poster img {
+  /* Set the element’s height. */
   height: 100%;
+  /* Set the element’s width. */
   width: 100%;
+  /* Choose how an image/video fits its box, including cropping with cover or preserving the full image with contain. */
   object-fit: cover;
+  /* Animate changes to the named properties using the specified duration/easing. */
   transition: transform 0.35s;
 }
 .movie-card:hover .poster img {
+  /* Move, rotate, or scale the painted element without changing its normal layout box. */
   transform: scale(1.025);
 }
 .poster:after {
+  /* Supply generated content for this pseudo-element. */
   content: '';
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: absolute;
+  /* Set top, right, bottom, and left offsets together for a positioned element. */
   inset: 60% 0 0;
+  /* Paint this element’s background colour or image. */
   background: linear-gradient(transparent, #0c0e1490);
 }
+/* The play hint becomes visible on hover or keyboard focus. */
 .poster-play {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: absolute;
+  /* Set top, right, bottom, and left offsets together for a positioned element. */
   inset: 0;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Paint this element’s background colour or image. */
   background: #00000015;
+  /* Set transparency, where 1 is fully visible and 0 is transparent. */
   opacity: 0;
+  /* Animate changes to the named properties using the specified duration/easing. */
   transition: opacity 0.2s;
+  /* Set the stacking level within the applicable stacking context. */
   z-index: 1;
 }
 .poster-play svg {
+  /* Paint this element’s background colour or image. */
   background: #111319bb;
+  /* Set border width, line style, and colour together. */
   border: 1px solid #ffffff44;
+  /* Round the corners by the specified amount. */
   border-radius: 50%;
+  /* Set the space inside this element between its content and border. */
   padding: 13px;
+  /* Set the element’s width. */
   width: 52px;
+  /* Set the element’s height. */
   height: 52px;
 }
 .poster:hover .poster-play,
 .poster:focus-visible .poster-play {
+  /* Set transparency, where 1 is fully visible and 0 is transparent. */
   opacity: 1;
 }
+/* Poster overlays show the supplied TMDB rating and the user watched status. */
 .rating,
 .watched-badge {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: absolute;
+  /* Set the top offset for this positioned element. */
   top: 12px;
+  /* Set the left offset for this positioned element. */
   left: 12px;
+  /* Set the space inside this element between its content and border. */
   padding: 4px 7px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 5px;
+  /* Round the corners by the specified amount. */
   border-radius: 5px;
+  /* Paint this element’s background colour or image. */
   background: #0c0e14dc;
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #9fcaff;
+  /* Set the stacking level within the applicable stacking context. */
   z-index: 2;
 }
 .watched-badge {
+  /* Set the left offset for this positioned element. */
   left: auto;
+  /* Set the right offset for this positioned element. */
   right: 10px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #c5dccb;
 }
+/* A readable title-based illustration covers missing or failed poster images. */
 .poster-fallback {
+  /* Set the element’s height. */
   height: 100%;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Lay flex children out in a row or column. */
   flex-direction: column;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 15px;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Align inline text within the element. */
   text-align: center;
+  /* Set the space inside this element between its content and border. */
   padding: 20px;
+  /* Paint this element’s background colour or image. */
   background: linear-gradient(145deg, #2c3949, #171b25);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #b6c4d8;
+  /* Choose the typeface and fallback fonts. */
   font-family: Outfit, sans-serif;
+  /* Set the text size. */
   font-size: 21px;
 }
+/* Metadata and personal actions displayed below each card image. */
 .card-content {
+  /* Set the space inside this element between its content and border. */
   padding: 16px;
 }
 .card-meta {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 5px;
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the outside space below this element. */
   margin-bottom: 7px;
 }
 .card-content h3 {
+  /* Set the text size. */
   font-size: 19px;
+  /* Set the vertical spacing of text lines. */
   line-height: 1.4;
+  /* Control text wrapping and preservation of spaces/newlines. */
   white-space: nowrap;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
+  /* Choose the indicator, such as an ellipsis, when clipped text cannot fit. */
   text-overflow: ellipsis;
 }
 .card-genres {
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 6px 0 15px;
 }
 .card-actions {
+  /* Set the upper separating border. */
   border-top: 1px solid var(--border);
+  /* Set the inside space above the content. */
   padding-top: 10px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 4px;
 }
 .action-icons {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 1px;
 }
 .card-actions .text-button {
+  /* Set the text size. */
   font-size: 12px;
 }
+/* A horizontal row scrolls independently and snaps cards into convenient positions. */
 .movie-rail {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Set the size of columns automatically created by this grid. */
   grid-auto-columns: calc((100% - 72px) / 4);
+  /* Choose the direction in which the grid places additional children. */
   grid-auto-flow: column;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 24px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: auto;
+  /* Set the space inside this element between its content and border. */
   padding: 0 0 12px;
+  /* Enable scroll snapping on the specified axis and choose how strongly it snaps. */
   scroll-snap-type: x proximity;
 }
 .movie-rail > * {
+  /* Choose the alignment point used when this item snaps into view. */
   scroll-snap-align: start;
 }
 .movie-rail .poster {
+  /* Keep this width-to-height ratio as the element resizes. */
   aspect-ratio: 16/10;
 }
+/* Compact recently explored titles use smaller image-and-label rows. */
 .recent-strip {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 14px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: auto;
+  /* Set the inside space below the content. */
   padding-bottom: 8px;
 }
 .recent-strip > button {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 12px;
+  /* Set how this child grows, shrinks, and chooses its starting size within a flex container. */
   flex: 0 0 230px;
+  /* Align inline text within the element. */
   text-align: left;
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Round the corners by the specified amount. */
   border-radius: 9px;
+  /* Set the space inside this element between its content and border. */
   padding: 10px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
 }
 .recent-strip img {
+  /* Set the element’s width. */
   width: 42px;
+  /* Set the element’s height. */
   height: 58px;
+  /* Choose how an image/video fits its box, including cropping with cover or preserving the full image with contain. */
   object-fit: cover;
+  /* Round the corners by the specified amount. */
   border-radius: 4px;
 }
 .recent-strip span {
+  /* Set the text size. */
   font-size: 12px;
 }
 .recent-strip small {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: block;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the outside space above this element. */
   margin-top: 5px;
 }
 .recent-play {
+  /* Set the outside space on the left. */
   margin-left: auto;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
 }
 .recent-strip .poster-fallback {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: none;
 }
+/* The sort control and Load More spacing at the result grid. */
 .sort-label {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 10px;
+  /* Control text wrapping and preservation of spaces/newlines. */
   white-space: nowrap;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the text size. */
   font-size: 12px;
 }
 .sort-label select {
+  /* Set the space inside this element between its content and border. */
   padding: 7px 10px;
+  /* Set the text size. */
   font-size: 12px;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
 }
 .load-more {
+  /* Align inline text within the element. */
   text-align: center;
+  /* Set the outside space above this element. */
   margin-top: 35px;
 }
+/* Shared empty/error message surface. Skeleton cards below indicate pending data. */
 .empty-state {
+  /* Align inline text within the element. */
   text-align: center;
+  /* Set the space inside this element between its content and border. */
   padding: 38px 20px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Lay flex children out in a row or column. */
   flex-direction: column;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 10px;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Set border width, line style, and colour together. */
   border: 1px dashed var(--border);
+  /* Round the corners by the specified amount. */
   border-radius: 10px;
 }
 .empty-state h3 {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
 }
 .empty-state p {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
+  /* Limit how wide the element may become. */
   max-width: 460px;
 }
 .empty-state .button {
+  /* Set the outside space above this element. */
   margin-top: 10px;
 }
 .skeleton-card {
+  /* Set the element’s height. */
   height: 360px;
+  /* Round the corners by the specified amount. */
   border-radius: 12px;
   background: linear-gradient(
     100deg,
@@ -724,453 +1218,747 @@ label textarea {
     var(--secondary) 45%,
     var(--card) 60%
   );
+  /* Control how the background image scales to fill its element. */
   background-size: 200%;
+  /* Run the named keyframes using the duration/repetition options shown. */
   animation: shimmer 1.8s infinite;
 }
 @keyframes shimmer {
   to {
+    /* Position the background image within its element. */
     background-position: -200%;
   }
 }
+/* Library/collection page heading, notice, tabs, and local search. */
 .page-heading {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 20px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 20px 0 28px;
 }
 .page-heading h1 {
+  /* Set the text size. */
   font-size: 42px;
 }
 .notice {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set border width, line style, and colour together. */
   border: 1px solid #6494ca40;
+  /* Paint this element’s background colour or image. */
   background: #6494ca0d;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Round the corners by the specified amount. */
   border-radius: 9px;
+  /* Set the space inside this element between its content and border. */
   padding: 14px 18px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0 0 24px;
 }
 .library-tabs {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 25px;
+  /* Set the lower separating border. */
   border-bottom: 1px solid var(--border);
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: auto;
+  /* Control text wrapping and preservation of spaces/newlines. */
   white-space: nowrap;
 }
 .library-tabs button {
+  /* Paint this element’s background colour or image. */
   background: none;
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the space inside this element between its content and border. */
   padding: 18px 0;
+  /* Set the lower separating border. */
   border-bottom: 2px solid transparent;
+  /* Set the text size. */
   font-size: 13px;
 }
 .library-tabs button[aria-selected='true'] {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
+  /* Override only the lower border’s colour. */
   border-bottom-color: var(--primary);
 }
 .library-search {
+  /* Limit how wide the element may become. */
   max-width: 250px;
+  /* Set the space inside this element between its content and border. */
   padding: 8px 12px;
 }
+/* Collection previews arrange poster collages in a responsive grid. */
 .collection-grid {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Define the number and sizing of the grid’s columns. */
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Add spacing between adjacent grid/flex children. */
   gap: 22px;
 }
 .collection-card {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: relative;
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Round the corners by the specified amount. */
   border-radius: 12px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
 }
 .collection-card h3 {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 16px 16px 5px;
+  /* Set the text size. */
   font-size: 18px;
 }
 .collection-card p {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0 16px 18px;
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
 .collage {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Set the element’s height. */
   height: 140px;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 3px;
+  /* Paint this element’s background colour or image. */
   background: var(--secondary);
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
 }
 .collage > div {
+  /* Set the element’s width. */
   width: 33.33%;
+  /* Set the element’s height. */
   height: 100%;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
 }
 .collage img {
+  /* Set the element’s width. */
   width: 100%;
+  /* Set the element’s height. */
   height: 100%;
+  /* Choose how an image/video fits its box, including cropping with cover or preserving the full image with contain. */
   object-fit: cover;
 }
 .collage .poster-fallback {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the space inside this element between its content and border. */
   padding: 5px;
 }
 .collection-actions {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: flex-end;
+  /* Set the space inside this element between its content and border. */
   padding: 0 12px 10px;
 }
+/* The public collection introduction and final discovery invitation. */
 .shared-heading {
+  /* Align inline text within the element. */
   text-align: center;
+  /* Set the space inside this element between its content and border. */
   padding: 40px 0 45px;
 }
 .shared-heading .eyebrow {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 8px;
 }
 .shared-heading h1 {
+  /* Set the text size. */
   font-size: 52px;
 }
 .shared-heading .button {
+  /* Set the outside space above this element. */
   margin-top: 12px;
 }
 .demo-note {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: block;
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the outside space above this element. */
   margin-top: 18px;
 }
 .shared-cta {
+  /* Align inline text within the element. */
   text-align: center;
+  /* Set the space inside this element between its content and border. */
   padding: 60px 20px;
+  /* Set the outside space above this element. */
   margin-top: 60px;
+  /* Round the corners by the specified amount. */
   border-radius: 16px;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
 }
 .shared-cta p {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
+/* Dim and blur the current page while a Radix portal displays its dialog above it. */
 .modal-overlay {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: fixed;
+  /* Set top, right, bottom, and left offsets together for a positioned element. */
   inset: 0;
+  /* Paint this element’s background colour or image. */
   background: #080a10d9;
+  /* Apply a visual effect to the content behind this translucent element. */
   backdrop-filter: blur(9px);
+  /* Set the stacking level within the applicable stacking context. */
   z-index: 50;
 }
+/* Normal dialog positioning and scroll limits. modal-wide adapts the trailer dialog. */
 .modal-content {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: fixed;
+  /* Set the left offset for this positioned element. */
   left: 50%;
+  /* Set the top offset for this positioned element. */
   top: 50%;
+  /* Move, rotate, or scale the painted element without changing its normal layout box. */
   transform: translate(-50%, -50%);
+  /* Set the element’s width. */
   width: calc(100% - 32px);
+  /* Limit how wide the element may become. */
   max-width: 480px;
+  /* Limit how tall the element may become. */
   max-height: 90svh;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: auto;
+  /* Paint this element’s background colour or image. */
   background: var(--card);
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Round the corners by the specified amount. */
   border-radius: 16px;
+  /* Set the space inside this element between its content and border. */
   padding: 26px;
+  /* Set the stacking level within the applicable stacking context. */
   z-index: 51;
+  /* Draw the specified shadow around or inside this element. */
   box-shadow: 0 30px 100px #0008;
 }
 .modal-wide {
+  /* Limit how wide the element may become. */
   max-width: 1180px;
+  /* Set the space inside this element between its content and border. */
   padding: 0;
 }
 .modal-heading {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 16px;
+  /* Set the outside space below this element. */
   margin-bottom: 22px;
 }
 .modal-heading h2 {
+  /* Set the text size. */
   font-size: 22px;
 }
 .modal-wide > .modal-heading {
+  /* Set the space inside this element between its content and border. */
   padding: 17px 24px;
+  /* Set the lower separating border. */
   border-bottom: 1px solid var(--border);
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
+  /* Paint this element’s background colour or image. */
   background: var(--background);
 }
 .modal-wide .modal-heading h2 {
+  /* Set the text size. */
   font-size: 18px;
 }
+/* Previous/Next title controls and the two-column trailer/details layout. */
 .trailer-toolbar {
+  /* Set the space inside this element between its content and border. */
   padding: 14px 24px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Set the lower separating border. */
   border-bottom: 1px solid var(--border);
+  /* Add spacing between adjacent grid/flex children. */
   gap: 12px;
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
 .trailer-toolbar .button {
+  /* Set the text size. */
   font-size: 11px;
+  /* Keep the element at least this tall. */
   min-height: 32px;
+  /* Set the space inside this element between its content and border. */
   padding: 7px 10px;
 }
 .trailer-layout {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Define the number and sizing of the grid’s columns. */
   grid-template-columns: 1.45fr 1fr;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 28px;
+  /* Set the space inside this element between its content and border. */
   padding: 26px;
 }
+/* Keep the embedded YouTube frame at a sixteen-to-nine aspect ratio. */
 .video-player {
+  /* Keep this width-to-height ratio as the element resizes. */
   aspect-ratio: 16/9;
+  /* Paint this element’s background colour or image. */
   background: #080a10;
+  /* Round the corners by the specified amount. */
   border-radius: 10px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
 }
 .video-player iframe {
+  /* Set the element’s width. */
   width: 100%;
+  /* Set the element’s height. */
   height: 100%;
+  /* Set border width, line style, and colour together. */
   border: 0;
 }
 .video-player .empty-state {
+  /* Set the element’s height. */
   height: 100%;
+  /* Set border width, line style, and colour together. */
   border: 0;
+  /* Paint this element’s background colour or image. */
   background: transparent;
 }
+/* Optional provider information beneath the trailer. */
 .availability {
+  /* Set the space inside this element between its content and border. */
   padding: 18px;
+  /* Set border width, line style, and colour together. */
   border: 1px solid var(--border);
+  /* Paint this element’s background colour or image. */
   background: var(--background);
+  /* Round the corners by the specified amount. */
   border-radius: 10px;
+  /* Set the outside space above this element. */
   margin-top: 18px;
 }
 .availability h3 {
+  /* Set the text size. */
   font-size: 15px;
 }
 .availability p {
+  /* Set the text size. */
   font-size: 12px;
 }
 .availability .chip {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 3px;
 }
 .detail-info h2 {
+  /* Set the text size. */
   font-size: 34px;
 }
 .detail-meta {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
 .synopsis {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the text size. */
   font-size: 13px;
+  /* Set the vertical spacing of text lines. */
   line-height: 1.8;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 22px 0;
 }
 .detail-buttons {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 9px;
 }
 .credit-block {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 24px 0;
 }
 .credit-block h3 {
+  /* Set the text size. */
   font-size: 13px;
 }
 .credit-block p {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 5px 0 15px;
 }
 .detail-loading {
+  /* Set the element’s height. */
   height: 400px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Set both grid alignment directions together. */
   place-items: center;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
 }
 .video-choices {
+  /* Set the outside space above this element. */
   margin-top: 12px;
 }
+/* Shared vertical form spacing, validation errors, and dialog action rows. */
 .form-stack {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Lay flex children out in a row or column. */
   flex-direction: column;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 17px;
 }
 .field-error {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: block;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #ffb4ab;
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the outside space above this element. */
   margin-top: 5px;
 }
 .dialog-footer {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: flex-end;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 10px;
+  /* Set the outside space above this element. */
   margin-top: 25px;
+  /* Control whether flex children may move onto another row. */
   flex-wrap: wrap;
 }
 .dialog-footer > .text-button {
+  /* Set the outside space on the right. */
   margin-right: auto;
 }
 .form-links {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: space-between;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 15px;
 }
 .divider {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 12px;
+  /* Set the text size. */
   font-size: 11px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 5px 0;
 }
 .divider:before,
 .divider:after {
+  /* Supply generated content for this pseudo-element. */
   content: '';
+  /* Set the element’s height. */
   height: 1px;
+  /* Paint this element’s background colour or image. */
   background: var(--border);
+  /* Set how this child grows, shrinks, and chooses its starting size within a flex container. */
   flex: 1;
 }
+/* Collection-save title preview and checkbox choices. */
 .save-title {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 16px;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Set the inside space below the content. */
   padding-bottom: 20px;
+  /* Set the lower separating border. */
   border-bottom: 1px solid var(--border);
 }
 .save-title > div {
+  /* Set the element’s width. */
   width: 52px;
+  /* Set the element’s height. */
   height: 75px;
+  /* Round the corners by the specified amount. */
   border-radius: 5px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
 }
 .save-title img {
+  /* Set the element’s width. */
   width: 100%;
+  /* Set the element’s height. */
   height: 100%;
+  /* Choose how an image/video fits its box, including cropping with cover or preserving the full image with contain. */
   object-fit: cover;
 }
 .save-title .poster-fallback {
+  /* Set the text size. */
   font-size: 10px;
+  /* Set the space inside this element between its content and border. */
   padding: 3px;
 }
 .save-title p {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 4px 0;
 }
 .collection-options {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 15px 0;
+  /* Limit how tall the element may become. */
   max-height: 35vh;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: auto;
 }
 .collection-options label {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 12px;
+  /* Set the space inside this element between its content and border. */
   padding: 13px 5px;
 }
 .collection-options input {
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0;
+  /* Set the element’s width. */
   width: 17px;
 }
 .collection-options label > span {
+  /* Set the outside space on the left. */
   margin-left: auto;
 }
+/* Read-only share URL and copy button. */
 .share-url {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 6px;
+  /* Set the outside space above this element. */
   margin-top: 20px;
 }
 .share-url input {
+  /* Set how this child grows, shrinks, and chooses its starting size within a flex container. */
   flex: 1;
+  /* Set the text size. */
   font-size: 12px;
 }
+/* Guest import icon, counts, and poster preview strip. */
 .sync-icon {
+  /* Set the element’s width. */
   width: 64px;
+  /* Set the element’s height. */
   height: 64px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Set both grid alignment directions together. */
   place-items: center;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--primary);
+  /* Paint this element’s background colour or image. */
   background: #6494ca1a;
+  /* Round the corners by the specified amount. */
   border-radius: 50%;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 0 auto 20px;
 }
 .sync-counts {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 45px;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 22px;
 }
 .sync-counts span {
+  /* Set the text size. */
   font-size: 12px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Lay flex children out in a row or column. */
   flex-direction: column;
+  /* Align inline text within the element. */
   text-align: center;
 }
 .sync-counts strong {
+  /* Set the text size. */
   font-size: 25px;
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--foreground);
 }
 .sync-posters {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 8px;
+  /* Set the outside space below this element. */
   margin-bottom: 22px;
 }
 .sync-posters > div {
+  /* Set the element’s width. */
   width: 58px;
+  /* Set the element’s height. */
   height: 85px;
+  /* Round the corners by the specified amount. */
   border-radius: 5px;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
 }
 .sync-posters img {
+  /* Set the element’s width. */
   width: 100%;
+  /* Set the element’s height. */
   height: 100%;
+  /* Choose how an image/video fits its box, including cropping with cover or preserving the full image with contain. */
   object-fit: cover;
 }
+/* Selectable mood choices and email-token page layout. */
 .mood-grid {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Define the number and sizing of the grid’s columns. */
   grid-template-columns: 1fr 1fr;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 12px;
+  /* Set the outside space above this element. */
   margin-top: 25px;
 }
 .auth-token-page {
+  /* Limit how wide the element may become. */
   max-width: 460px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 60px auto;
+  /* Set the space inside this element between its content and border. */
   padding: 20px;
 }
 .auth-token-page h1 {
+  /* Set the text size. */
   font-size: 32px;
+  /* Set the outside space below this element. */
   margin-bottom: 28px;
 }
+/* Full-height welcome layout, with decorative artwork beside the entry choices. */
 .welcome-page {
+  /* Keep the element at least this tall. */
   min-height: 100svh;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Define the number and sizing of the grid’s columns. */
   grid-template-columns: 1fr 1fr;
   background:
     radial-gradient(ellipse at 10% 40%, #20334755, transparent 55%),
     var(--background);
 }
 .welcome-art {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: relative;
+  /* Control clipping or scrolling when content exceeds this element’s box. */
   overflow: hidden;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: flex;
+  /* Align children across the cross axis of this flex/grid container. */
   align-items: center;
+  /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
   justify-content: center;
+  /* Set the right-hand separating border. */
   border-right: 1px solid var(--border);
+  /* Paint this element’s background colour or image. */
   background: linear-gradient(145deg, #0d111acc, #1c273766);
 }
 .welcome-frame {
+  /* Set border width, line style, and colour together. */
   border: 1px solid #a9bfdc33;
+  /* Round the corners by the specified amount. */
   border-radius: 25px;
+  /* Set the element’s width. */
   width: 210px;
+  /* Set the element’s height. */
   height: 280px;
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Set both grid alignment directions together. */
   place-items: center;
+  /* Paint this element’s background colour or image. */
   background: linear-gradient(140deg, #475d7688, #10151d);
+  /* Move, rotate, or scale the painted element without changing its normal layout box. */
   transform: rotate(-12deg);
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: #a1c4e7;
   box-shadow:
     30px 35px 0 #182637,
@@ -1178,361 +1966,527 @@ label textarea {
     0 0 120px #6494ca20;
 }
 .welcome-orbit {
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: absolute;
+  /* Set the element’s width. */
   width: 540px;
+  /* Set the element’s height. */
   height: 540px;
+  /* Round the corners by the specified amount. */
   border-radius: 50%;
+  /* Set border width, line style, and colour together. */
   border: 1px solid #6494ca19;
 }
 .welcome-orbit:after {
+  /* Supply generated content for this pseudo-element. */
   content: '';
+  /* Choose positioning relative to normal flow, an ancestor, the viewport, or a sticky scrolling boundary. */
   position: absolute;
+  /* Set top, right, bottom, and left offsets together for a positioned element. */
   inset: 50px;
+  /* Round the corners by the specified amount. */
   border-radius: 50%;
+  /* Set border width, line style, and colour together. */
   border: 1px solid #6494ca19;
 }
 .welcome-content {
+  /* Limit how wide the element may become. */
   max-width: 480px;
+  /* Set the element’s width. */
   width: 100%;
+  /* Set the space inside this element between its content and border. */
   padding: 65px 42px;
+  /* Override cross-axis alignment for this individual child. */
   align-self: center;
+  /* Align this grid child within its own area along the inline axis. */
   justify-self: center;
+  /* Align inline text within the element. */
   text-align: center;
 }
 .welcome-content h1 {
+  /* Set the text size. */
   font-size: 67px;
+  /* Set how light or bold the text appears. */
   font-weight: 400;
+  /* Adjust the space between adjacent characters. */
   letter-spacing: -3px;
+  /* Set the space outside this element; auto margins can center it within available space. */
   margin: 12px 0 20px;
 }
 .welcome-content > p:not(.eyebrow) {
+  /* Set the foreground/text colour inherited by children unless they override it. */
   color: var(--muted);
+  /* Set the text size. */
   font-size: 17px;
+  /* Set the vertical spacing of text lines. */
   line-height: 1.8;
 }
 .welcome-actions {
+  /* Choose the layout mode, or hide the element when the value is none. */
   display: grid;
+  /* Add spacing between adjacent grid/flex children. */
   gap: 12px;
+  /* Set the outside space above this element. */
   margin-top: 40px;
 }
 .welcome-actions .button {
+  /* Keep the element at least this tall. */
   min-height: 49px;
 }
 .google-g {
+  /* Choose the typeface and fallback fonts. */
   font-family: Arial, sans-serif;
+  /* Set the text size. */
   font-size: 19px;
+  /* Set how light or bold the text appears. */
   font-weight: bold;
 }
 .welcome-content .welcome-footnote {
+  /* Set the text size. */
   font-size: 12px !important;
+  /* Set the outside space above this element. */
   margin-top: 35px;
 }
+/* Wide desktop adjustments increase the number of visible poster columns. */
 @media (min-width: 1400px) {
   .movie-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
+/* Laptop/tablet adjustments reduce margins, grid columns, and trailer panel spacing. */
 @media (max-width: 1100px) {
   .header-inner {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 25px;
+    /* Set the space inside this element between its content and border. */
     padding: 15px 28px;
   }
   .container {
+    /* Set the space inside this element between its content and border. */
     padding: 32px 28px 50px;
   }
   .desktop-nav {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 18px;
   }
   .header-actions {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 8px;
   }
   .sync-header {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: none;
   }
   .movie-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* Add spacing between adjacent grid/flex children. */
     gap: 18px;
   }
   .collection-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .movie-rail {
+    /* Set the size of columns automatically created by this grid. */
     grid-auto-columns: calc((100% - 36px) / 3);
+    /* Add spacing between adjacent grid/flex children. */
     gap: 18px;
   }
   .trailer-layout {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: 1.2fr 1fr;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 20px;
   }
   .advanced-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: repeat(3, 1fr);
   }
 }
+/* Mobile layout uses compact navigation, two-column cards, and a stacked full-screen trailer. */
 @media (max-width: 760px) {
   .desktop-nav {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: none;
   }
   .mobile-menu {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: inline-flex;
   }
   .header-inner {
+    /* Set the space inside this element between its content and border. */
     padding: 13px 20px;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 15px;
+    /* Keep the element at least this tall. */
     min-height: 64px;
   }
   .brand {
+    /* Set the text size. */
     font-size: 21px;
   }
   .header-actions {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 6px;
   }
   .session-badge {
+    /* Set the text size. */
     font-size: 10px;
+    /* Set the space inside this element between its content and border. */
     padding: 5px 9px;
   }
   .signin-button {
+    /* Set the text size. */
     font-size: 11px;
+    /* Keep the element at least this tall. */
     min-height: 32px;
+    /* Set the space inside this element between its content and border. */
     padding: 5px 10px;
   }
   .container {
+    /* Set the space inside this element between its content and border. */
     padding: 28px 20px 45px;
   }
   .discovery-intro {
+    /* Set the space inside this element between its content and border. */
     padding: 20px 0 24px;
   }
   .discovery-intro h1 {
+    /* Set the text size. */
     font-size: 33px;
   }
   .discovery-intro > p:not(.eyebrow) {
+    /* Set the text size. */
     font-size: 13px;
   }
   .search-box {
+    /* Set the outside space above this element. */
     margin-top: 22px;
+    /* Set the space inside this element between its content and border. */
     padding: 2px 12px;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 10px;
   }
   .search-box input {
+    /* Set the text size. */
     font-size: 12px;
   }
   .search-box kbd {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: none;
   }
   .filter-panel {
+    /* Set the space inside this element between its content and border. */
     padding: 16px;
   }
   .filter-top {
+    /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
     justify-content: center;
   }
   .tool-actions {
+    /* Set the element’s width. */
     width: 100%;
+    /* Distribute children along the main axis of this flex container or the grid’s inline axis. */
     justify-content: center;
   }
   .genre-row {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 7px;
+    /* Set the space outside this element; auto margins can center it within available space. */
     margin: 18px 0;
   }
   .chip {
+    /* Set the text size. */
     font-size: 11px;
+    /* Set the space inside this element between its content and border. */
     padding: 6px 11px;
   }
   .filter-bottom > span {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: none;
   }
   .advanced-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: 1fr 1fr;
   }
   .movie-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* Add spacing between adjacent grid/flex children. */
     gap: 14px;
   }
   .movie-rail {
+    /* Set the size of columns automatically created by this grid. */
     grid-auto-columns: 65%;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 14px;
   }
   .section {
+    /* Set the outside space above this element. */
     margin-top: 32px;
   }
   .section-heading {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 10px;
+    /* Align children across the cross axis of this flex/grid container. */
     align-items: flex-start;
   }
   .section-heading h2 {
+    /* Set the text size. */
     font-size: 22px;
   }
   .sort-label {
+    /* Set the text size. */
     font-size: 0;
   }
   .sort-label select {
+    /* Limit how wide the element may become. */
     max-width: 130px;
   }
   .card-content {
+    /* Set the space inside this element between its content and border. */
     padding: 11px;
   }
   .card-content h3 {
+    /* Set the text size. */
     font-size: 16px;
   }
   .card-meta,
   .card-genres {
+    /* Set the text size. */
     font-size: 10px;
   }
   .card-actions {
+    /* Control whether flex children may move onto another row. */
     flex-wrap: wrap;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 4px;
   }
   .action-icons {
+    /* Set the outside space on the left. */
     margin-left: auto;
   }
   .card-actions .icon-button {
+    /* Set the smallest allowed width; zero lets flex/grid content shrink. */
     min-width: 29px;
+    /* Set the space inside this element between its content and border. */
     padding: 5px;
   }
   .card-actions .text-button {
+    /* Set the text size. */
     font-size: 11px;
   }
   .rating,
   .watched-badge {
+    /* Set the top offset for this positioned element. */
     top: 8px;
+    /* Set the left offset for this positioned element. */
     left: 8px;
+    /* Set the text size. */
     font-size: 10px;
   }
   .watched-badge {
+    /* Set the left offset for this positioned element. */
     left: auto;
+    /* Set the right offset for this positioned element. */
     right: 7px;
+    /* Set the top offset for this positioned element. */
     top: auto;
+    /* Set the bottom offset for this positioned element. */
     bottom: 9px;
   }
   .page-heading {
+    /* Align children across the cross axis of this flex/grid container. */
     align-items: flex-start;
+    /* Lay flex children out in a row or column. */
     flex-direction: column;
   }
   .page-heading h1 {
+    /* Set the text size. */
     font-size: 35px;
   }
   .library-tabs {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 22px;
   }
   .library-tabs button {
+    /* Set the text size. */
     font-size: 12px;
   }
   .collection-grid {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* Add spacing between adjacent grid/flex children. */
     gap: 14px;
   }
   .collage {
+    /* Set the element’s height. */
     height: 120px;
   }
   .collection-card h3 {
+    /* Set the text size. */
     font-size: 16px;
   }
   .library-search {
+    /* Limit how wide the element may become. */
     max-width: 160px;
+    /* Set the text size. */
     font-size: 12px;
   }
   .shared-heading {
+    /* Set the space inside this element between its content and border. */
     padding: 25px 0 35px;
   }
   .shared-heading h1 {
+    /* Set the text size. */
     font-size: 40px;
   }
   .shared-cta {
+    /* Set the outside space above this element. */
     margin-top: 35px;
+    /* Set the space inside this element between its content and border. */
     padding: 35px 18px;
   }
   .shared-cta h2 {
+    /* Set the text size. */
     font-size: 26px;
   }
   .app-footer {
+    /* Set the space inside this element between its content and border. */
     padding: 25px 20px;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 8px 15px;
   }
   .modal-content {
+    /* Set the space inside this element between its content and border. */
     padding: 20px;
+    /* Limit how tall the element may become. */
     max-height: 92svh;
   }
   .modal-wide {
+    /* Set the element’s width. */
     width: 100%;
+    /* Set the element’s height. */
     height: 100svh;
+    /* Limit how tall the element may become. */
     max-height: 100svh;
+    /* Round the corners by the specified amount. */
     border-radius: 0;
+    /* Set border width, line style, and colour together. */
     border: 0;
+    /* Set the space inside this element between its content and border. */
     padding: 0;
   }
   .modal-wide > .modal-heading {
+    /* Set the space inside this element between its content and border. */
     padding: 13px 16px;
   }
   .trailer-toolbar {
+    /* Set the space inside this element between its content and border. */
     padding: 12px 16px;
+    /* Lay flex children out in a row or column. */
     flex-direction: column;
+    /* Align children across the cross axis of this flex/grid container. */
     align-items: flex-start;
   }
   .trailer-toolbar .inline-actions {
+    /* Add spacing between adjacent grid/flex children. */
     gap: 7px;
   }
   .trailer-layout {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: 1fr;
+    /* Set the space inside this element between its content and border. */
     padding: 16px;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 22px;
   }
   .detail-info h2 {
+    /* Set the text size. */
     font-size: 30px;
   }
   .welcome-page {
+    /* Define the number and sizing of the grid’s columns. */
     grid-template-columns: 1fr;
   }
   .welcome-art {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: none;
   }
   .welcome-content {
+    /* Set the space inside this element between its content and border. */
     padding: 45px 30px;
+    /* Limit how wide the element may become. */
     max-width: 430px;
   }
   .welcome-content h1 {
+    /* Set the text size. */
     font-size: 61px;
   }
   .welcome-content > p:not(.eyebrow) {
+    /* Set the text size. */
     font-size: 16px;
   }
   .empty-state {
+    /* Set the space inside this element between its content and border. */
     padding: 30px 16px;
   }
   .empty-state p {
+    /* Set the text size. */
     font-size: 12px;
   }
   .skeleton-card {
+    /* Set the element’s height. */
     height: 300px;
   }
 }
+/* Respect the operating-system preference by disabling decorative motion. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *:before,
   *:after {
+    /* Run the named keyframes using the duration/repetition options shown. */
     animation: none !important;
+    /* Animate changes to the named properties using the specified duration/easing. */
     transition: none !important;
+    /* Choose whether programmatic/navigation scrolling moves smoothly or immediately. */
     scroll-behavior: auto !important;
   }
 }
+/* Small-phone adjustments keep the header and filter buttons within the available width. */
 @media (max-width: 480px) {
   .header-inner {
+    /* Set the space inside this element between its content and border. */
     padding: 13px 16px;
+    /* Add spacing between adjacent grid/flex children. */
     gap: 12px;
   }
   .brand {
+    /* Set the text size. */
     font-size: 20px;
   }
   .session-badge {
+    /* Choose the layout mode, or hide the element when the value is none. */
     display: none;
   }
   .tool-actions .button {
+    /* Set how this child grows, shrinks, and chooses its starting size within a flex container. */
     flex: 1;
+    /* Set the space inside this element between its content and border. */
     padding: 9px 10px;
+    /* Set the text size. */
     font-size: 11px;
   }
   .segmented button {
+    /* Set the space inside this element between its content and border. */
     padding: 8px 14px;
+    /* Set the text size. */
     font-size: 12px;
   }
   .sort-label select {
+    /* Limit how wide the element may become. */
     max-width: 115px;
   }
 }

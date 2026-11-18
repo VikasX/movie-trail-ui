@@ -2,6 +2,8 @@
 
 A responsive movie and TV discovery frontend built with React, strict TypeScript, Vite, Tailwind CSS, shadcn/Radix primitives, Redux Toolkit, RTK Query, React Router, React Hook Form, Zod, and Sonner.
 
+For a beginner-friendly explanation of how the files work together, read [Understanding CineScope](docs/FRONTEND_GUIDE.md). It includes a reading order, click-to-data walkthroughs, TypeScript examples, and a file-by-file reference. The handwritten source files also contain explanations beside the relevant logic.
+
 ## Run locally
 
 Use Node.js 20.19+ or 22.12+ and npm.
